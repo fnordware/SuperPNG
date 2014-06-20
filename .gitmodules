@@ -1,0 +1,9 @@
+[submodule "ext/libpng"]
+	path = ext/libpng
+	url = git://git.code.sf.net/p/libpng/code
+[submodule "ext/zlib"]
+	path = ext/zlib
+	url = git://github.com/madler/zlib.git
+[submodule "ext/lcms"]
+	path = ext/lcms
+	url = git://github.com/mm2/Little-CMS.git
