@@ -40,42 +40,42 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A82C6E21954E8F900EEC94C /* libpng.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D2AAC046055464E500DB518D /* liblibpng.a */;
+			remoteGlobalIDString = D2AAC046055464E500DB518D;
 			remoteInfo = libpng;
 		};
 		2A82C6E91954E91200EEC94C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A82C6E21954E8F900EEC94C /* libpng.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* libpng */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = libpng;
 		};
 		2A82C8801954E9B900EEC94C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A82C8791954E9B900EEC94C /* lcms.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D2AAC046055464E500DB518D /* liblcms.a */;
+			remoteGlobalIDString = D2AAC046055464E500DB518D;
 			remoteInfo = lcms;
 		};
 		2A82C8831954E9C900EEC94C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A82C8791954E9B900EEC94C /* lcms.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* lcms */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = lcms;
 		};
 		2A82CA351954EA7A00EEC94C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A82CA2E1954EA7A00EEC94C /* zlib.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D2AAC046055464E500DB518D /* libzlib.a */;
+			remoteGlobalIDString = D2AAC046055464E500DB518D;
 			remoteInfo = zlib;
 		};
 		2A82CA381954EA8800EEC94C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A82CA2E1954EA7A00EEC94C /* zlib.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* zlib */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = zlib;
 		};
 /* End PBXContainerItemProxy section */
@@ -1633,7 +1633,6 @@
 				REZ_PREFIX_FILE = "$(SRCROOT)/../../ext/adobe_photoshop_cs5_sdk_mac/pluginsdk/samplecode/common/includes/MachOMacrezXcode.h";
 				REZ_PREPROCESSOR_DEFINITIONS = PHOTOSHOP_SDK_VERSION_8;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
-				SYMROOT = ../../../Output/Mac/Debug/;
 				WRAPPER_EXTENSION = plugin;
 				ZERO_LINK = NO;
 			};
@@ -1697,7 +1696,6 @@
 				REZ_PREPROCESSOR_DEFINITIONS = PHOTOSHOP_SDK_VERSION_8;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				STRIP_INSTALLED_PRODUCT = NO;
-				SYMROOT = ../../../Output/Mac/Debug/;
 				WRAPPER_EXTENSION = plugin;
 				ZERO_LINK = NO;
 			};
