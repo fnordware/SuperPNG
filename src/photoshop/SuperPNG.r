@@ -1,13 +1,32 @@
 
+//////////////////////////////////////////////////////////////////////////////////
 //
-// SuperPNG
+// Copyright (c) 2002-2014, Brendan Bolles
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+// 
+// * Redistributions of source code must retain the above copyright notice, this
+//   list of conditions and the following disclaimer.
+// 
+// * Redistributions in binary form must reproduce the above copyright notice,
+//   this list of conditions and the following disclaimer in the documentation
+//   and/or other materials provided with the distribution.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// by Brendan Bolles
-//
+//////////////////////////////////////////////////////////////////////////////////
 
-//-------------------------------------------------------------------------------
-//	Definitions -- Required by include files.
-//-------------------------------------------------------------------------------
 
 #include "SuperPNG_Version.h"
 
@@ -18,22 +37,14 @@
 #define ReleaseString	SuperPNG_Build_Date_Manual
 #define CurrentYear		SuperPNG_Build_Year
 
-//-------------------------------------------------------------------------------
-//	Definitions -- Required by other resources in this rez file.
-//-------------------------------------------------------------------------------
-
-// Dictionary (aete) resources:
-
 #define vendorName			"fnord"
 #define plugInAETEComment 	SuperPNG_Description
 
 #define plugInSuiteID		'sdK4'
-#define plugInClassID		'sPNG' //'simP'
+#define plugInClassID		'sPNG'
 #define plugInEventID		typeNull // must be this
 
-//-------------------------------------------------------------------------------
-//	Set up included files for Macintosh and Windows.
-//-------------------------------------------------------------------------------
+
 
 #include "PIDefines.h"
 
@@ -41,12 +52,8 @@
 	#include "Types.r"
 	#include "SysTypes.r"
 	#include "PIGeneral.r"
-	//#include "PIUtilities.r"
-	//#include "DialogUtilities.r"
 #elif defined(__PIWin__)
 	#include "PIGeneral.h"
-	//#include "PIUtilities.r"
-	//#include "WinDialogUtils.r"
 #endif
 
 #ifndef ResourceID
@@ -56,11 +63,9 @@
 #include "PITerminology.h"
 #include "PIActions.h"
 
+
 #include "SuperPNG_Terminology.h"
 
-//-------------------------------------------------------------------------------
-//	PiPL resource
-//-------------------------------------------------------------------------------
 
 resource 'PiPL' (ResourceID, plugInName " PiPL", purgeable)
 {
@@ -71,7 +76,6 @@ resource 'PiPL' (ResourceID, plugInName " PiPL", purgeable)
 		Category { "PNG" },
 		Priority { 1 }, // Causes SuperPNG to be used over Adobe's PNG plug-in
 
-		//ZStringName { "$$$/AdobePlugin/PIPLInfo/PluginName/PNG=PNG" },
 		Version { (latestFormatVersion << 16) | latestFormatSubVersion },
 
 		#ifdef __PIMac__
@@ -100,7 +104,6 @@ resource 'PiPL' (ResourceID, plugInName " PiPL", purgeable)
 			#endif
 		#endif
 	
-		// ClassID, eventID, aete ID, uniqueString:
 		HasTerminology { plugInClassID, plugInEventID, ResourceID, vendorName " " plugInName },
 		
 		SupportedModes
@@ -119,15 +122,13 @@ resource 'PiPL' (ResourceID, plugInName " PiPL", purgeable)
 		ReadExtensions { { 'PNG ' } },
 		WriteExtensions { { 'PNG ' } },
 		FilteredExtensions { { 'PNG ' } },
-		FormatFlags { fmtSavesImageResources, //(by saying we do, PS won't store them, thereby avoiding problems)
+		FormatFlags { fmtSavesImageResources, // by saying we do, PS won't store them, thereby avoiding problems
 		              fmtCanRead, 
 					  fmtCanWrite, 
 					  fmtCanWriteIfRead, 
-					  fmtCanWriteTransparency, // yes, Transparency!
+					  fmtCanWriteTransparency,
 					  fmtCannotCreateThumbnail },
-	#ifdef PHOTOSHOP_SDK_VERSION_8
-		PlugInMaxSize { 2147483647, 2147483647 }, // Photoshop 8
-	#endif
+		PlugInMaxSize { 2147483647, 2147483647 },
 		FormatMaxSize { { 32767, 32767 } },
 		FormatMaxChannels { {   1, 2, 1, 4, 0, 0, 
 							   0, 0, 0, 0, 2, 4 } },
@@ -135,28 +136,23 @@ resource 'PiPL' (ResourceID, plugInName " PiPL", purgeable)
 							iccCanEmbedIndexed,
 							iccCanEmbedRGB,
 							iccCannotEmbedCMYK },
-							
-	#ifdef PHOTOSHOP_SDK_VERSION_8
 		XMPWrite { },
 		XMPRead { }
-	#endif	
 		},
 	};
 
 
-//-------------------------------------------------------------------------------
-//	PiMI resource (kept for backward compatibility)
-//-------------------------------------------------------------------------------
-
 resource 'PiMI' (ResourceID, plugInName " PiMI", purgeable)
 {
-	latestFormatVersion, 	/* Version, subVersion, and priority of the interface */
+	latestFormatVersion,
 	latestFormatSubVersion,
 	0,
 
 	supportsGrayScale +
-	supportsRGBColor,			/* Supported Image Modes */
-	'    ',						/* Required host */
+	supportsRGBColor +
+	supportsIndexedColor +
+	supportsBitmap,
+	'    ',
 	
 	{
 		canRead,
@@ -164,48 +160,44 @@ resource 'PiMI' (ResourceID, plugInName " PiMI", purgeable)
 		canWrite,
 		canWriteIfRead,
 		savesResources,
-		{  0, 2, 0, 4,		/* Maximum # of channels for each plug-in mode */
+		{  0, 2, 0, 4,		// FormatMaxChannels
 		  0, 0, 0, 0,
 		  0, 0,  2,  4,
 		   0,  0,  0,  0 },
-		32767,				/* Maximum rows allowed in document */
-		32767,				/* Maximum columns allowed in document */
-		'PNGf',				/* The file type if we create a file. */
-		'8BIM',				/* The creator type if we create a file. */
-		{					/* The type-creator pairs supported. */
+		32767,
+		32767,
+		'PNGf',
+		'8BIM',
+		{
 			'8B1F', '    '
 		},
-		{					/* The extensions supported. */
+		{
 		}
 	},
 	
 };
 
-//-------------------------------------------------------------------------------
-//	Dictionary (scripting) resource
-//-------------------------------------------------------------------------------
 
 resource 'aete' (ResourceID, plugInName " dictionary", purgeable)
 {
-	1, 0, english, roman,									/* aete version and language specifiers */
+	1, 0, english, roman,
 	{
-		vendorName,											/* vendor suite name */
-		"Super-duper PNG format",							/* optional description */
-		plugInSuiteID,										/* suite ID */
-		1,													/* suite code, must be 1 */
-		1,													/* suite level, must be 1 */
-		{},													/* structure for filters */
-		{													/* non-filter plug-in class here */
-			//vendorName " simpleFormat",
-			"SuperPNG",										/* unique class name */
-			plugInClassID,									/* class ID, must be unique or Suite ID */
-			plugInAETEComment,								/* optional description */
-			{												/* define inheritance */
-				"$$$/private/AETE/Inheritance=<Inheritance>",							/* must be exactly this */
-				keyInherits,								/* must be keyInherits */
-				classFormat,								/* parent: Format, Import, Export */
-				"parent class format",						/* optional description */
-				flagsSingleProperty,						/* if properties, list below */
+		vendorName,
+		"Super-duper PNG format",
+		plugInSuiteID,
+		1,
+		1,
+		{},
+		{
+			"SuperPNG",
+			plugInClassID,
+			plugInAETEComment,
+			{
+				"$$$/private/AETE/Inheritance=<Inheritance>",
+				keyInherits,
+				classFormat,
+				"parent class format",
+				flagsSingleProperty,
 							
 				"Compression",
 				keyPNGcompression,
@@ -242,14 +234,11 @@ resource 'aete' (ResourceID, plugInName " dictionary", purgeable)
 				typeEnumerated,
 				"Source of the alpha channel",
 				flagsSingleProperty
-
-				/* no properties */
 			},
-			{}, /* elements (not supported) */
-			/* class descriptions */
+			{},
 		},
-		{}, /* comparison ops (not supported) */
-		{	/* any enumerations */
+		{},
+		{
 			typeAlphaChannel,
 			{
                 "None",
@@ -270,10 +259,6 @@ resource 'aete' (ResourceID, plugInName " dictionary", purgeable)
 
 #ifdef __PIMac__
 
-//-------------------------------------------------------------------------------
-//	Version 'vers' resources.
-//-------------------------------------------------------------------------------
-
 resource 'vers' (1, plugInName " Version", purgeable)
 {
 	5, 0x50, final, 0, verUs,
@@ -287,7 +272,6 @@ resource 'vers' (2, plugInName " Version", purgeable)
 	VersionString,
 	"by Brendan Bolles"
 };
-
 
 #endif // __PIMac__
 

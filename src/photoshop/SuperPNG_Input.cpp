@@ -1,12 +1,39 @@
 
-#include "SuperPNG.h"
+//////////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2002-2014, Brendan Bolles
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+// 
+// * Redistributions of source code must retain the above copyright notice, this
+//   list of conditions and the following disclaimer.
+// 
+// * Redistributions in binary form must reproduce the above copyright notice,
+//   this list of conditions and the following disclaimer in the documentation
+//   and/or other materials provided with the distribution.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//////////////////////////////////////////////////////////////////////////////////
 
-#include <stdlib.h>
-#include <math.h>
+
+#include "SuperPNG.h"
 
 #include "lcms2_internal.h"
 
-#include "zlib.h"
+#include <stdlib.h>
+#include <math.h>
 
 #ifdef __PIWin__
 #include "PIDLLInstance.h"
@@ -22,7 +49,7 @@ void SuperPNG_VerifyFile(GPtr globals)
 	// Start at the top and read 4 bytes.
 #define TEST_BYTES	4
 
-	char buf[4];
+	char buf[TEST_BYTES];
 
 #ifdef __PIMac__
 	gResult = FSSetForkPosition(gStuff->dataFork, fsFromStart, 0);
@@ -31,7 +58,6 @@ void SuperPNG_VerifyFile(GPtr globals)
 	
 	gResult = FSReadFork(gStuff->dataFork, fsAtMark, 0, readCount, (void *)buf, &readCount);
 #else // __PIWin__
-	// set pointer to beginning of file
 	LARGE_INTEGER lpos;
 
 	lpos.QuadPart = 0;
@@ -49,14 +75,17 @@ void SuperPNG_VerifyFile(GPtr globals)
 	result = ReadFile((HANDLE)gStuff->dataFork, (LPVOID)buf, count, &readCount, NULL);
 #endif
 	
-	if(gResult != noErr || readCount != TEST_BYTES) return;
+	if(gResult != noErr)
+		return;
 	
 	// Check the identifier
-	if(png_sig_cmp((png_bytep)buf, (png_size_t)0, (png_size_t)TEST_BYTES))
+	if(readCount != TEST_BYTES ||
+		png_sig_cmp((png_bytep)buf, (png_size_t)0, (png_size_t)TEST_BYTES) != 0)
 	{
 		gResult = formatCannotRead;
 	}
 }
+
 
 #pragma mark-
 
@@ -235,9 +264,9 @@ static void ReadMetadataPre(GPtr globals, png_structp png_ptr, png_infop info_pt
 		png_uint_32 icc_proflen = 0;
 		int icc_compression;	
 
-		Boolean is_color = (gStuff->imageMode == plugInModeRGBColor ||
-							gStuff->imageMode == plugInModeRGB48 ||
-							gStuff->imageMode == plugInModeIndexedColor);
+		const bool is_color = (gStuff->imageMode == plugInModeRGBColor ||
+								gStuff->imageMode == plugInModeRGB48 ||
+								gStuff->imageMode == plugInModeIndexedColor);
 			
 		if(png_get_iCCP(png_ptr, info_ptr,
 					&icc_name, &icc_compression, &icc_profile, &icc_proflen) )
@@ -379,9 +408,9 @@ static void ReadMetadataPre(GPtr globals, png_structp png_ptr, png_infop info_pt
 	if( png_get_pixels_per_meter(png_ptr, info_ptr) )
 	{
 		// PNG uses pixels per meter
-		png_uint_32 ppm = png_get_pixels_per_meter(png_ptr, info_ptr);
-		png_uint_32 ppm_x = png_get_x_pixels_per_meter(png_ptr, info_ptr);
-		png_uint_32 ppm_y = png_get_y_pixels_per_meter(png_ptr, info_ptr);
+		const png_uint_32 ppm = png_get_pixels_per_meter(png_ptr, info_ptr);
+		const png_uint_32 ppm_x = png_get_x_pixels_per_meter(png_ptr, info_ptr);
+		const png_uint_32 ppm_y = png_get_y_pixels_per_meter(png_ptr, info_ptr);
 		
 		// Photoshop uses dots per inch
 		// 1 inch = 25.4 mm (exactly)
@@ -411,18 +440,13 @@ static void ReadMetadataPost(GPtr globals, png_structp png_ptr, png_infop info_p
 		
 		if( png_get_text(png_ptr, info_ptr, &text_blocks, &num_blocks) )
 		{
-			//FILE *fp = fopen("/Users/mrb/Desktop/png_text.txt", "w+");
-		
-			for(int i=0; i < num_blocks;i++)
+			for(int i=0; i < num_blocks; i++)
 			{	
 				const png_text &text_block = text_blocks[i];
 				
 				const png_size_t text_len = (text_block.compression >= PNG_ITXT_COMPRESSION_NONE ?
 												text_block.itxt_length : text_block.text_length);
 				
-				//if(fp)
-				//	fprintf(fp, "%s\n", text_block.key);
-			
 				if(!strcmp(text_block.key, "Copyright"))
 				{
 					PISetProp(kPhotoshopSignature, 'cpyr', 0, true, NULL);
@@ -459,25 +483,7 @@ static void ReadMetadataPost(GPtr globals, png_structp png_ptr, png_infop info_p
 					
 					//PIDisposeHandle(xmp_handle);
 				}
-				else if(!strcmp(text_block.key, "Raw profile type xmp") && text_len > 0 && text_block.text != NULL)
-				{
-					Handle xmp_handle;
-					char *xmp_ptr;
-					
-					uLongf the_full_size = text_block.itxt_length * 10;
-					
-					xmp_handle = myNewHandle(globals, the_full_size);
-					xmp_ptr = (char *)myLockHandle(globals, xmp_handle);
-					
-					int z_result = uncompress((Bytef *)xmp_ptr, &the_full_size, (Bytef *)text_block.text, text_block.itxt_length);
-					
-					z_result++;
-					z_result--;
-				}
 			}
-			
-			//if(fp)
-			//	fclose(fp);
 		}
 	}
 }
@@ -518,9 +524,6 @@ static void png_init_read(GPtr globals, png_structp *png_ptr, png_infop *info_pt
 
 void SuperPNG_FileInfo(GPtr globals)
 {
-	int color_type, bit_depth, interlace_type;
-	png_uint_32 width, height;
-	
 	png_structp png_ptr;
 	png_infop info_ptr;
 
@@ -532,9 +535,9 @@ void SuperPNG_FileInfo(GPtr globals)
 		return;
 
 
-	// Set jmpbuf, some sort of error thing
+	// this is how libpng handles errors
 #ifdef PNG_SETJMP_SUPPORTED
-	if (setjmp(png_jmpbuf(png_ptr)))
+	if(setjmp(png_jmpbuf(png_ptr)))
 	{
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		
@@ -558,6 +561,9 @@ void SuperPNG_FileInfo(GPtr globals)
 	png_read_info(png_ptr, info_ptr);
 	
 		
+	int color_type, bit_depth, interlace_type;
+	png_uint_32 width, height;
+	
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
 		&interlace_type, NULL, NULL);
 
@@ -605,7 +611,7 @@ void SuperPNG_FileInfo(GPtr globals)
 	
 	// Translate from PNG color types to Photoshop image modes & planes
 	
-	if( color_type & PNG_COLOR_MASK_PALETTE )
+	if(color_type & PNG_COLOR_MASK_PALETTE)
 	{
 		int trans_counter = 0;
 		
@@ -673,33 +679,53 @@ void SuperPNG_FileInfo(GPtr globals)
 			}
 		}
 	}	 
-	else if( color_type & PNG_COLOR_MASK_COLOR )
+	else if(color_type & PNG_COLOR_MASK_COLOR)
 	{
 		if( gStuff->depth == 16 )
+		{
 			gStuff->imageMode = plugInModeRGB48;
+		}
 		else
 			gStuff->imageMode = plugInModeRGBColor;
 
 		if( color_type & PNG_COLOR_MASK_ALPHA )
+		{
 			gStuff->planes = 4;
+		}
 		else if( png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) )
-		{	gStuff->planes = 4; png_set_tRNS_to_alpha(png_ptr); }
+		{
+			gStuff->planes = 4;
+			
+			png_set_tRNS_to_alpha(png_ptr);
+		}
 		else		
 			gStuff->planes = 3;
 	}
-	else  // Ass-ume gray.	We'd assume color but the PNG mask is 0
+	else
 	{
-		if( gStuff->depth == 16 )
+		// greyscale
+		if(gStuff->depth == 16)
+		{
 			gStuff->imageMode = plugInModeGray16;
-		else if ( gStuff->depth == 1 )
+		}
+		else if(gStuff->depth == 1)
+		{
 			gStuff->imageMode = plugInModeBitmap;
+		}
 		else
 			gStuff->imageMode = plugInModeGrayScale;
-
+		
+		
 		if( color_type & PNG_COLOR_MASK_ALPHA )
+		{
 			gStuff->planes = 2;
+		}
 		else if( png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) )
-		{	gStuff->planes = 2; png_set_tRNS_to_alpha(png_ptr); }
+		{
+			gStuff->planes = 2;
+			
+			png_set_tRNS_to_alpha(png_ptr);
+		}
 		else
 			gStuff->planes = 1;
 	}
@@ -723,20 +749,17 @@ void SuperPNG_FileInfo(GPtr globals)
 
 void SuperPNG_ReadFile(GPtr globals)
 {
-	int color_type, bit_depth, interlace_type;
-	png_uint_32 width, height;
-
 	png_structp png_ptr;
 	png_infop info_ptr;
 	
-	// set up read struct
+	// set up read struct again
 	png_init_read(globals, &png_ptr, &info_ptr);
 
 	if(gResult != noErr)
 		return;
 
 
-	// Set jmpbuf, some sort of error thing
+	// this is how libpng handles errors
 #ifdef PNG_SETJMP_SUPPORTED
 	if (setjmp(png_jmpbuf(png_ptr)))
 	{
@@ -759,6 +782,10 @@ void SuperPNG_ReadFile(GPtr globals)
 	// read the header (again)
 	png_read_info(png_ptr, info_ptr);
 	
+	
+	int color_type, bit_depth, interlace_type;
+	png_uint_32 width, height;
+
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
 		&interlace_type, NULL, NULL);
 	
@@ -826,7 +853,7 @@ void SuperPNG_ReadFile(GPtr globals)
 			// read the image
 			png_bytepp row_pointers = (png_bytepp)png_malloc(png_ptr, height * sizeof(png_bytep));
 			
-			for (int row=0; row < height; row++)
+			for(int row=0; row < height; row++)
 				row_pointers[row] = (png_bytep)( (char *)gPixelData + (row * gRowBytes) );
 			
 			png_read_image(png_ptr, row_pointers);
@@ -884,7 +911,7 @@ void SuperPNG_ReadFile(GPtr globals)
 	else
 	{
 		// load some reasonable number of scanlines at a time
-		int num_scanlines = (gStuff->tileHeight == 0 ? 256 : gStuff->tileHeight);
+		const int num_scanlines = (gStuff->tileHeight == 0 ? 256 : gStuff->tileHeight);
 		
 		BufferID bufferID = 0;
 		
@@ -904,11 +931,13 @@ void SuperPNG_ReadFile(GPtr globals)
 			
 			while(y < height && gResult == noErr)
 			{
-				int high_scanline = minimum<int>(y + num_scanlines - 1, height - 1);
-				int block_height = 1 + high_scanline - y;
+				const int high_scanline = minimum<int>(y + num_scanlines - 1, height - 1);
+				const int block_height = 1 + high_scanline - y;
+				
 				
 				// read image
 				png_read_rows(png_ptr, row_pointers, NULL, block_height);
+
 
 				// demote if necessary
 				if(gStuff->depth == 16)
@@ -945,6 +974,7 @@ void SuperPNG_ReadFile(GPtr globals)
 					}
 				}
 				
+				
 				// read into Photoshop
 				gStuff->theRect.top = gStuff->theRect32.top = y;
 				gStuff->theRect.bottom = gStuff->theRect32.bottom = high_scanline + 1;
@@ -952,6 +982,7 @@ void SuperPNG_ReadFile(GPtr globals)
 				gResult = AdvanceState();
 				
 				PIUpdateProgress(y, height);
+				
 				
 				y = high_scanline + 1;
 			}

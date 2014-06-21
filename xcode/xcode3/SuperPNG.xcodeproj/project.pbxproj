@@ -789,13 +789,13 @@
 			children = (
 				2A82C3931954D13900EEC94C /* SuperPNG.h */,
 				2A82C3921954D13900EEC94C /* SuperPNG.cpp */,
-				2A82C3941954D13900EEC94C /* SuperPNG.r */,
 				2A82C3961954D13900EEC94C /* SuperPNG_Input.cpp */,
 				2A82C3991954D13900EEC94C /* SuperPNG_Output.cpp */,
 				2A82C39C1954D13900EEC94C /* SuperPNG_Scripting.cpp */,
 				2A82C39D1954D13900EEC94C /* SuperPNG_Terminology.h */,
 				2A82C39E1954D13900EEC94C /* SuperPNG_UI.h */,
 				2A82C3A01954D13900EEC94C /* SuperPNG_Version.h */,
+				2A82C3941954D13900EEC94C /* SuperPNG.r */,
 				2A82C3871954D13900EEC94C /* mac */,
 			);
 			name = photoshop;
@@ -1612,10 +1612,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					__PI__,
-					PS_CS4_SDK,
 					NDEBUG,
-					KDU_MAC_SPEEDUPS,
-					KDU_NO_SSSE3,
 				);
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -1631,7 +1628,6 @@
 				PLUGIN_TYPE = 8BIF;
 				PREBINDING = NO;
 				REZ_PREFIX_FILE = "$(SRCROOT)/../../ext/adobe_photoshop_cs5_sdk_mac/pluginsdk/samplecode/common/includes/MachOMacrezXcode.h";
-				REZ_PREPROCESSOR_DEFINITIONS = PHOTOSHOP_SDK_VERSION_8;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				WRAPPER_EXTENSION = plugin;
 				ZERO_LINK = NO;
@@ -1675,10 +1671,7 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					__PI__,
-					PS_CS4_SDK,
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = __PI__;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_PKGINFO_FILE = YES;
@@ -1693,7 +1686,6 @@
 				PLUGIN_TYPE = 8BIF;
 				PREBINDING = NO;
 				REZ_PREFIX_FILE = "$(SRCROOT)/../../ext/adobe_photoshop_cs5_sdk_mac/pluginsdk/samplecode/common/includes/MachOMacrezXcode.h";
-				REZ_PREPROCESSOR_DEFINITIONS = PHOTOSHOP_SDK_VERSION_8;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				STRIP_INSTALLED_PRODUCT = NO;
 				WRAPPER_EXTENSION = plugin;

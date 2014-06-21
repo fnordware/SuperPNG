@@ -1,17 +1,38 @@
+//////////////////////////////////////////////////////////////////////////////////
 //
-// SuperPNG
+// Copyright (c) 2002-2014, Brendan Bolles
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+// 
+// * Redistributions of source code must retain the above copyright notice, this
+//   list of conditions and the following disclaimer.
+// 
+// * Redistributions in binary form must reproduce the above copyright notice,
+//   this list of conditions and the following disclaimer in the documentation
+//   and/or other materials provided with the distribution.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// by Brendan Bolles
-//
+//////////////////////////////////////////////////////////////////////////////////
+
 
 #ifndef __SuperPNG_H__
 #define __SuperPNG_H__
 
-#include "PIDefines.h"
+//#include "PIDefines.h"
 #include "PIFormat.h"
 #include "PIUtilities.h"
-
-#include "SuperPNG_Terminology.h"
 
 
 #include "png.h"
@@ -30,12 +51,12 @@
 #define Z_RLE                 3
 #define Z_FIXED               4
 #define Z_DEFAULT_STRATEGY    0
-// compression strategy; see deflateInit2() below for details
+// compression strategy
 #endif
 
 
-typedef long A_long;
-typedef char A_Boolean;
+typedef int32_t A_long;
+typedef unsigned char A_Boolean;
 typedef unsigned char A_u_char;
 
 enum {
@@ -63,8 +84,7 @@ typedef struct {
 
 
 typedef struct Globals
-{ // This is our structure that we use to pass globals between routines:
-
+{
 	short				*result;			// Must always be first in Globals.
 	FormatRecord		*formatParamBlock;	// Must always be second in Globals.
 
@@ -74,18 +94,10 @@ typedef struct Globals
 	SuperPNG_inData		in_options;
 	SuperPNG_outData	options;
 	
-} Globals, *GPtr, **GHdl;				// *GPtr = global pointer; **GHdl = global handle
-	
-// The routines that are dispatched to from the jump list should all be
-// defined as
-//		void RoutineName (GPtr globals);
-// And this typedef will be used as the type to create a jump list:
-typedef void (* FProc)(GPtr globals);
+} Globals, *GPtr, **GHdl;
 
 
-//-------------------------------------------------------------------------------
-//	Globals -- definitions and macros
-//-------------------------------------------------------------------------------
+// The Photoshop SDK relies on this stuff
 
 #define gResult				(*(globals->result))
 #define gStuff				(globals->formatParamBlock)
@@ -97,31 +109,11 @@ typedef void (* FProc)(GPtr globals);
 #define gInOptions			(globals->in_options)
 #define gOptions			(globals->options)
 
-//-------------------------------------------------------------------------------
-//	Prototypes
-//-------------------------------------------------------------------------------
 
-#ifdef PS_CS4_SDK
-typedef intptr_t entryData;
-typedef void * allocateGlobalsPointer;
-typedef intptr_t simpleProp;
-#else
-typedef long entryData;
-typedef uint32 allocateGlobalsPointer;
-typedef int32 simpleProp;
-#endif
-
-// Everything comes in and out of PluginMain. It must be first routine in source:
-DLLExport MACPASCAL void PluginMain (const short selector,
-					  	             FormatRecord *formatParamBlock,
-						             entryData *data,
-						             short *result);
-
-// funcs living in other files
+// functions living in other files
 void SuperPNG_VerifyFile(GPtr globals);
 void SuperPNG_FileInfo(GPtr globals);
 void SuperPNG_ReadFile(GPtr globals);
-
 void SuperPNG_WriteFile(GPtr globals);
 
 // my backward compatible buffer and handle routines
@@ -137,10 +129,15 @@ Ptr myLockBuffer(GPtr globals, const BufferID inBufferID, Boolean inMoveHigh);
 void myFreeBuffer(GPtr globals, const BufferID inBufferID);
 
 
-// During write phase:
+// scripting functions
 Boolean ReadScriptParamsOnWrite (GPtr globals);	// Read any scripting params.
 OSErr WriteScriptParamsOnWrite (GPtr globals);	// Write any scripting params.
 
-//-------------------------------------------------------------------------------
+
+// Our entry point, the one function exported
+DLLExport MACPASCAL void PluginMain (const short selector,
+					  	             FormatRecord *formatParamBlock,
+						             intptr_t *data,
+						             short *result);
 
 #endif // __SuperPNG_H__

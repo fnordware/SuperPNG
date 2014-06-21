@@ -1,15 +1,45 @@
 
+//////////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2002-2014, Brendan Bolles
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+// 
+// * Redistributions of source code must retain the above copyright notice, this
+//   list of conditions and the following disclaimer.
+// 
+// * Redistributions in binary form must reproduce the above copyright notice,
+//   this list of conditions and the following disclaimer in the documentation
+//   and/or other materials provided with the distribution.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//////////////////////////////////////////////////////////////////////////////////
+
+
 #include "SuperPNG.h"
 
 #include "SuperPNG_UI.h"
 
-// glbals needed by a bunch of Photoshop SDK routines
+
+// Globals needed by a bunch of Photoshop SDK routines
+SPBasicSuite * sSPBasic = NULL;
+SPPluginRef gPlugInRef = NULL;
+
 #ifdef __PIWin__
 HINSTANCE hDllInstance = NULL;
 #endif
-
-SPBasicSuite * sSPBasic = NULL;
-SPPluginRef gPlugInRef = NULL;
 
 
 static void DoAbout(AboutRecordPtr aboutP)
@@ -25,13 +55,13 @@ static void DoAbout(AboutRecordPtr aboutP)
 	SuperPNG_About(plugHndl, hwnd);
 }
 
+
 #pragma mark-
+
 
 static void InitGlobals(Ptr globalPtr)
 {	
-	// create "globals" as a our struct global pointer so that any
-	// macros work:
-	GPtr globals = (GPtr)globalPtr;
+	GPtr globals = (GPtr)globalPtr; // for macros
 		
 	gPixelData = NULL;
 	gRowBytes = 0;
@@ -145,7 +175,9 @@ void myFreeBuffer(GPtr globals, const BufferID inBufferID)
 		gStuff->bufferProcs->freeProc(inBufferID);
 }
 
+
 #pragma mark-
+
 
 static void DoFilterFile(GPtr globals)
 {
@@ -153,10 +185,12 @@ static void DoFilterFile(GPtr globals)
 }
 
 
-// Additional parameter functions
-//   These transfer settings to and from gStuff->revertInfo
+// Transfer settings to and from gStuff->revertInfo
 
-#define SWAP_LONG(a)		((a >> 24) | ((a >> 8) & 0xff00) | ((a << 8) & 0xff0000) | (a << 24))
+static inline uint32_t SwapLong(uint32_t a)
+{
+	return ((a >> 24) | ((a >> 8) & 0xff00) | ((a << 8) & 0xff0000) | (a << 24));
+}
 
 static void TwiddleOptions(SuperPNG_inData *options)
 {
@@ -166,9 +200,9 @@ static void TwiddleOptions(SuperPNG_inData *options)
 static void TwiddleOptions(SuperPNG_outData *options)
 {
 #ifndef __PIMacPPC__
-	options->compression= SWAP_LONG(options->compression);
-	options->filter		= SWAP_LONG(options->filter);
-	options->strategy	= SWAP_LONG(options->strategy);
+	options->compression= SwapLong(options->compression);
+	options->filter		= SwapLong(options->filter);
+	options->strategy	= SwapLong(options->strategy);
 #endif
 }
 
@@ -454,7 +488,9 @@ static void DoEstimateFinish(GPtr globals)
 
 }
 
+
 #pragma mark-
+
 
 static void DoWritePrepare(GPtr globals)
 {
@@ -486,10 +522,11 @@ static void DoWriteFinish(GPtr globals)
 
 #pragma mark-
 
+typedef void (* FProc)(GPtr globals);
 
 DLLExport MACPASCAL void PluginMain(const short selector,
 						             FormatRecord *formatParamBlock,
-						             entryData *data,
+						             intptr_t *data,
 						             short *result)
 {
 	if (selector == formatSelectorAbout)
@@ -505,8 +542,8 @@ DLLExport MACPASCAL void PluginMain(const short selector,
 	}
 	else
 	{
-		sSPBasic = formatParamBlock->sSPBasic;  //thanks Tom
-		
+		// many utility functions in the Photoshop SDK depend on these globals being defined
+		sSPBasic = formatParamBlock->sSPBasic;
 		gPlugInRef = (SPPluginRef)formatParamBlock->plugInRef;
 		
 	#ifdef __PIWin__
@@ -515,31 +552,31 @@ DLLExport MACPASCAL void PluginMain(const short selector,
 	#endif
 
 		
-	 	static const FProc routineForSelector [] =
+	 	static const FProc routineForSelector[] =
 		{
-			/* formatSelectorAbout  				DoAbout, */
-			
-			/* formatSelectorReadPrepare */			DoReadPrepare,
-			/* formatSelectorReadStart */			DoReadStart,
-			/* formatSelectorReadContinue */		DoReadContinue,
-			/* formatSelectorReadFinish */			DoReadFinish,
-			
-			/* formatSelectorOptionsPrepare */		DoOptionsPrepare,
-			/* formatSelectorOptionsStart */		DoOptionsStart,
-			/* formatSelectorOptionsContinue */		DoOptionsContinue,
-			/* formatSelectorOptionsFinish */		DoOptionsFinish,
-			
-			/* formatSelectorEstimatePrepare */		DoEstimatePrepare,
-			/* formatSelectorEstimateStart */		DoEstimateStart,
-			/* formatSelectorEstimateContinue */	DoEstimateContinue,
-			/* formatSelectorEstimateFinish */		DoEstimateFinish,
-			
-			/* formatSelectorWritePrepare */		DoWritePrepare,
-			/* formatSelectorWriteStart */			DoWriteStart,
-			/* formatSelectorWriteContinue */		DoWriteContinue,
-			/* formatSelectorWriteFinish */			DoWriteFinish,
-			
-			/* formatSelectorFilterFile */			DoFilterFile
+			//DoAbout,
+
+			DoReadPrepare,
+			DoReadStart,
+			DoReadContinue,
+			DoReadFinish,
+
+			DoOptionsPrepare,
+			DoOptionsStart,
+			DoOptionsContinue,
+			DoOptionsFinish,
+
+			DoEstimatePrepare,
+			DoEstimateStart,
+			DoEstimateContinue,
+			DoEstimateFinish,
+
+			DoWritePrepare,
+			DoWriteStart,
+			DoWriteContinue,
+			DoWriteFinish,
+
+			DoFilterFile
 		};
 		
 		Ptr globalPtr = NULL;		// Pointer for global structure
@@ -552,7 +589,7 @@ DLLExport MACPASCAL void PluginMain(const short selector,
 			
 			if(*data == NULL)
 			{
-				*data = (entryData)formatParamBlock->handleProcs->newProc(sizeof(Globals));
+				*data = (intptr_t)formatParamBlock->handleProcs->newProc(sizeof(Globals));
 				
 				must_init = true;
 			}
@@ -577,32 +614,29 @@ DLLExport MACPASCAL void PluginMain(const short selector,
 		}
 		else
 		{
-			// old lame way
-			globalPtr = AllocateGlobals((allocateGlobalsPointer)result,
-										 (allocateGlobalsPointer)formatParamBlock,
+			// old way done by the Photoshop SDK
+			globalPtr = AllocateGlobals(result,
+										 formatParamBlock,
 										 formatParamBlock->handleProcs,
 										 sizeof(Globals),
 						 				 data,
 						 				 InitGlobals);
 
 			if(globalPtr == NULL)
-			{ // Something bad happened if we couldn't allocate our pointer.
-			  // Fortunately, everything's already been cleaned up,
-			  // so all we have to do is report an error.
-			  
-			  *result = memFullErr;
-			  return;
+			{
+				*result = memFullErr;
+				return;
 			}
 			
-			// Get our "globals" variable assigned as a Global Pointer struct with the
-			// data we've returned:
 			globals = (GPtr)globalPtr;
 		}
 
 
 		// Dispatch selector
-		if (selector > formatSelectorAbout && selector <= formatSelectorFilterFile)
-			(routineForSelector[selector-1])(globals); // dispatch using jump table
+		if(selector > formatSelectorAbout && selector <= formatSelectorFilterFile)
+		{
+			(routineForSelector[selector - 1])(globals); // dispatch using jump table
+		}
 		else
 			gResult = formatBadParameters;
 		
@@ -618,7 +652,5 @@ DLLExport MACPASCAL void PluginMain(const short selector,
 				PIUnlockHandle((Handle)*data);
 			}
 		}
-		
-	
-	} // about selector special		
+	}	
 }

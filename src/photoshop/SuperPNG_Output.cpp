@@ -1,15 +1,44 @@
 
+//////////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2002-2014, Brendan Bolles
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+// 
+// * Redistributions of source code must retain the above copyright notice, this
+//   list of conditions and the following disclaimer.
+// 
+// * Redistributions in binary form must reproduce the above copyright notice,
+//   this list of conditions and the following disclaimer in the documentation
+//   and/or other materials provided with the distribution.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//////////////////////////////////////////////////////////////////////////////////
+
+
 #include "SuperPNG.h"
+
+#include "lcms2_internal.h"
 
 #include <stdlib.h>
 
-//#include "lcms2.h"
-#include "lcms2_internal.h"
 
 
 static void png_replace_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-    FormatRecord *fmt_rec = (FormatRecord *)png_get_io_ptr(png_ptr);
+    FormatRecord *fmt_rec = static_cast<FormatRecord *>(png_get_io_ptr(png_ptr));
    
 #ifdef __PIMac__
 	ByteCount writeCount = length;
@@ -62,7 +91,6 @@ static Boolean sRGBtest(cmsHPROFILE iccH)
 	char name[256];
 	cmsUInt32Number namelen = cmsGetProfileInfoASCII(iccH, cmsInfoDescription,
 													"en", cmsNoCountry, name, 255);
-
 
 	return (!strcmp(name, "sRGB IEC61966-2.1") ||
 			!strcmp(name, "PNG sRGB") ||
@@ -210,7 +238,6 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 
 #ifdef __PIMac__	
 	// Write tIME chunk using Mac OS time structure (no time zone)
-#if __LP64__
 	time_t the_time = time(NULL);
 	tm *local_time = localtime(&the_time);
 	
@@ -220,18 +247,6 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 	pngTime.hour   = local_time->tm_hour;
 	pngTime.minute = local_time->tm_min;
 	pngTime.second = local_time->tm_sec;
-#else
-	DateTimeRec dateTime;
-	GetTime(&dateTime);
-	
-	pngTime.year   = dateTime.year;
-	pngTime.month  = dateTime.month;
-	pngTime.day    = dateTime.day;
-	pngTime.hour   = dateTime.hour;
-	pngTime.minute = dateTime.minute;
-	pngTime.second = dateTime.second;
-#endif // __LP64__
-
 #else
 	// Win time stuff
 	SYSTEMTIME	dateTime;
@@ -251,17 +266,17 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 	if( (gStuff->hostSig != 'FXTC') && gStuff->imageHRes )
 	{
 		// pixels per inch
-		double dpi_x = (double)gStuff->imageHRes / 65536.0;
-		double dpi_y = (double)gStuff->imageVRes / 65536.0;
+		const double dpi_x = (double)gStuff->imageHRes / 65536.0;
+		const double dpi_y = (double)gStuff->imageVRes / 65536.0;
 		
 		// PNG uses pixels per meter
 		// an inch is defined as exactly 25.4 mm
-		double ppm_x = dpi_x / 0.0254;
-		double ppm_y = dpi_y / 0.0254;
+		const double ppm_x = dpi_x / 0.0254;
+		const double ppm_y = dpi_y / 0.0254;
 		
 		// rounding
-		png_uint_32 i_ppm_x = ppm_x + 0.5;
-		png_uint_32 i_ppm_y = ppm_y + 0.5;
+		const png_uint_32 i_ppm_x = ppm_x + 0.5;
+		const png_uint_32 i_ppm_y = ppm_y + 0.5;
 	
 		png_set_pHYs(png_ptr, info_ptr, i_ppm_x, i_ppm_y, PNG_RESOLUTION_METER);
 	}
@@ -270,7 +285,7 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 	// Write ICC Profile - this will only happen if the user checks the box in Save As
 	if( gStuff->canUseICCProfiles && (gStuff->iCCprofileSize > 0) && (gStuff->iCCprofileData != NULL) )
 	{
-		Ptr icc = myLockHandle(globals, gStuff->iCCprofileData);
+		const Ptr icc = myLockHandle(globals, gStuff->iCCprofileData);
 	
 		if(icc)
 		{
@@ -385,7 +400,7 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 	if(gStuff->propertyProcs)
 	{
 		int32 handleSize[6] = {0,0,0,0,0,0}; // Max of 6 items for now
-		simpleProp simpleProperty[6] = {0,0,0,0,0,0};
+		intptr_t simpleProperty[6] = {0,0,0,0,0,0};
 		Handle complexProperty[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
 		png_text meta_text[7];
 		int meta_index = 0;
@@ -400,7 +415,8 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 				meta_text[meta_index].key			=	"Copyright";
 				meta_text[meta_index].compression	=	PNG_TEXT_COMPRESSION_NONE;
 				meta_text[meta_index].text			=	"This image copyrighted.";
-					meta_index++;
+				
+				meta_index++;
 			}
 
 			// tEXt : URL
@@ -415,7 +431,8 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 				meta_text[meta_index].key			=	"URL";
 				meta_text[meta_index].compression	=	PNG_TEXT_COMPRESSION_NONE;
 				meta_text[meta_index].text			=	the_text;
-					meta_index++;
+				
+				meta_index++;
 			}
 
 			// tEXt : File Name
@@ -430,7 +447,8 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 				meta_text[meta_index].key			=	"File Name";
 				meta_text[meta_index].compression	=	PNG_TEXT_COMPRESSION_NONE;
 				meta_text[meta_index].text			=	the_text;
-					meta_index++;
+				
+				meta_index++;
 			}
 
 			// iTXt : XMP
@@ -447,7 +465,8 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 				meta_text[meta_index].text			=	the_text;
 				meta_text[meta_index].lang			=	NULL;
 				meta_text[meta_index].lang_key		=	NULL;
-					meta_index++;
+				
+				meta_index++;
 			}
 		
 		}
@@ -461,16 +480,16 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 					meta_text[meta_index].text		=	"Adobe Photoshop";
 				else if(gStuff->hostSig == 'FXTC')
 					meta_text[meta_index].text		=	"Adobe After Effects";
-				/*else
-					meta_text[meta_index].text		=	gStuff->hostSig;*/
-						meta_index++;
+					
+				meta_index++;
 		}
 		
 		// tEXt : Writer
 		meta_text[meta_index].key			=	"Writer";
 		meta_text[meta_index].compression	=	PNG_TEXT_COMPRESSION_NONE;
 		meta_text[meta_index].text			=	"SuperPNG";
-			meta_index++;
+		
+		meta_index++;
 
 
 		if(meta_index)
@@ -484,6 +503,7 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 				if(complexProperty[i] != NULL)
 				{
 					myDisposeHandle(globals, complexProperty[i]); // p57 says I should dispose
+					
 					complexProperty[i] = NULL;
 				}
 			}
@@ -522,15 +542,6 @@ static void png_init_write(GPtr globals, png_structp *png_ptr, png_infop *info_p
 
 void SuperPNG_WriteFile(GPtr globals)
 {
-	int32 done;
-	int32 total;
-
-	int interlace_type;
-	int8 hi_plane, col_bytes, color_type, bit_depth, plane_bytes;
-	
-	//Boolean png_at_once = FALSE;
-	
-	
 	png_structp png_ptr;
 	png_infop info_ptr;
 	
@@ -538,28 +549,24 @@ void SuperPNG_WriteFile(GPtr globals)
 	if(gStuff->HostSupports32BitCoordinates && gStuff->imageSize32.h && gStuff->imageSize32.v)
 		gStuff->PluginUsing32BitCoordinates = TRUE;
 		
-		
-	int width = (gStuff->PluginUsing32BitCoordinates ? gStuff->imageSize32.h : gStuff->imageSize.h);
-	int height = (gStuff->PluginUsing32BitCoordinates ? gStuff->imageSize32.v : gStuff->imageSize.v);
+	const int width = (gStuff->PluginUsing32BitCoordinates ? gStuff->imageSize32.h : gStuff->imageSize.h);
+	const int height = (gStuff->PluginUsing32BitCoordinates ? gStuff->imageSize32.v : gStuff->imageSize.v);
 	
-	// Set up the progress variables.
 	
-	done = 0;
-	total = height;
-
-
 	// Set up image parameters
 
+	int8 hi_plane, num_channels, color_type, bit_depth, plane_bytes;
+	
 	if(gStuff->imageMode == plugInModeIndexedColor)
 	{
 		hi_plane = 0;
-		col_bytes = 1;
+		num_channels = 1;
 		color_type = PNG_COLOR_TYPE_PALETTE;
 	}
 	else if(gStuff->imageMode == plugInModeBitmap)
 	{
 		hi_plane = 0;
-		col_bytes = 1;
+		num_channels = 1;
 		color_type = PNG_COLOR_TYPE_GRAY;
 		//png_set_packing(png_ptr);
 	}
@@ -568,19 +575,19 @@ void SuperPNG_WriteFile(GPtr globals)
 	{
 		assert(gStuff->planes >= 1);
 	
-		bool have_transparency = (gStuff->planes >= 2);
-		bool have_alpha_channel = (gStuff->channelPortProcs && gStuff->documentInfo && gStuff->documentInfo->alphaChannels);
+		const bool have_transparency = (gStuff->planes >= 2);
+		const bool have_alpha_channel = (gStuff->channelPortProcs && gStuff->documentInfo && gStuff->documentInfo->alphaChannels);
 
-		bool use_transparency = (have_transparency && gOptions.alpha == PNG_ALPHA_TRANSPARENCY);
-		bool use_alpha_channel = (have_alpha_channel && gOptions.alpha == PNG_ALPHA_CHANNEL);
+		const bool use_transparency = (have_transparency && gOptions.alpha == PNG_ALPHA_TRANSPARENCY);
+		const bool use_alpha_channel = (have_alpha_channel && gOptions.alpha == PNG_ALPHA_CHANNEL);
 		
-		bool use_alpha = (use_transparency || use_alpha_channel);
+		const bool use_alpha = (use_transparency || use_alpha_channel);
 		
 		hi_plane = (use_transparency ? 1 : 0);
-		col_bytes = (use_alpha ? 2 : 1);
+		num_channels = (use_alpha ? 2 : 1);
 		color_type = (use_alpha ? PNG_COLOR_TYPE_GRAY_ALPHA : PNG_COLOR_TYPE_GRAY);
 	}
-	else //  Ass-uming RGB if not greyscale
+	else //  Assuming RGB if not greyscale
 	{
 		assert(gStuff->planes >= 3);
 	
@@ -593,13 +600,12 @@ void SuperPNG_WriteFile(GPtr globals)
 		bool use_alpha = (use_transparency || use_alpha_channel);
 		
 		hi_plane = (use_transparency ? 3 : 2);
-		col_bytes = (use_alpha ? 4 : 3);
+		num_channels = (use_alpha ? 4 : 3);
 		color_type = (use_alpha ? PNG_COLOR_TYPE_RGBA : PNG_COLOR_TYPE_RGB);
 	}
 	
 	
-	int8 num_channels = col_bytes;
-	
+	int col_bytes = num_channels;
 	
 	if(gStuff->depth == 16)
 	{
@@ -626,7 +632,7 @@ void SuperPNG_WriteFile(GPtr globals)
 	png_init_write(globals, &png_ptr, &info_ptr);
 
 
-	// Set jmpbuf, some sort of error thing
+	// This is how libpng handles errors
 #ifdef PNG_SETJMP_SUPPORTED
 	if(setjmp(png_jmpbuf(png_ptr)))
 	{
@@ -646,11 +652,8 @@ void SuperPNG_WriteFile(GPtr globals)
 	}
 #endif
 
-	if(gOptions.interlace == PNG_INTERLACE_ADAM7)
-		interlace_type = PNG_INTERLACE_ADAM7;
-	else
-		interlace_type = PNG_INTERLACE_NONE;
-	
+
+	const int interlace_type = (gOptions.interlace == PNG_INTERLACE_ADAM7 ? PNG_INTERLACE_ADAM7 : PNG_INTERLACE_NONE);	
 	
 	// Send the image parameters to info_ptr 
 	
@@ -663,7 +666,7 @@ void SuperPNG_WriteFile(GPtr globals)
 	{
 		png_set_filter(png_ptr, PNG_FILTER_TYPE_DEFAULT, PNG_NO_FILTERS);
 	}
-	else if(gOptions.filter <= 0x80)
+	else if(gOptions.filter <= PNG_ALL_FILTERS)
 	{
 		png_set_filter(png_ptr, PNG_FILTER_TYPE_DEFAULT, gOptions.filter);
 	}
@@ -685,7 +688,7 @@ void SuperPNG_WriteFile(GPtr globals)
 		// Set palette for indexed colored PNGs
 		png_color palette[PNG_MAX_PALETTE_LENGTH];
 		
-		int num_palette = (gStuff->lutCount == 0 ? 256 : gStuff->lutCount);
+		const int num_palette = (gStuff->lutCount == 0 ? 256 : gStuff->lutCount);
 		
 		for(int i=0; i < num_palette; i++)
 		{
