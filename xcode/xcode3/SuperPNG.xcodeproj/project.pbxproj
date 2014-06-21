@@ -790,15 +790,11 @@
 				2A82C3931954D13900EEC94C /* SuperPNG.h */,
 				2A82C3921954D13900EEC94C /* SuperPNG.cpp */,
 				2A82C3941954D13900EEC94C /* SuperPNG.r */,
-				2A82C3951954D13900EEC94C /* SuperPNG_banner.h */,
 				2A82C3961954D13900EEC94C /* SuperPNG_Input.cpp */,
-				2A82C3971954D13900EEC94C /* SuperPNG_InUI_ADM.cpp */,
 				2A82C3991954D13900EEC94C /* SuperPNG_Output.cpp */,
-				2A82C39A1954D13900EEC94C /* SuperPNG_OutUI_ADM.cpp */,
 				2A82C39C1954D13900EEC94C /* SuperPNG_Scripting.cpp */,
 				2A82C39D1954D13900EEC94C /* SuperPNG_Terminology.h */,
 				2A82C39E1954D13900EEC94C /* SuperPNG_UI.h */,
-				2A82C39F1954D13900EEC94C /* SuperPNG_UI_Cocoa.mm */,
 				2A82C3A01954D13900EEC94C /* SuperPNG_Version.h */,
 				2A82C3871954D13900EEC94C /* mac */,
 			);
@@ -809,6 +805,9 @@
 		2A82C3871954D13900EEC94C /* mac */ = {
 			isa = PBXGroup;
 			children = (
+				2A82C3951954D13900EEC94C /* SuperPNG_banner.h */,
+				2A82C3971954D13900EEC94C /* SuperPNG_InUI_ADM.cpp */,
+				2A82C39A1954D13900EEC94C /* SuperPNG_OutUI_ADM.cpp */,
 				2A82C3881954D13900EEC94C /* SuperPNG_About.xib */,
 				2A82C3891954D13900EEC94C /* SuperPNG_About_Controller.h */,
 				2A82C38A1954D13900EEC94C /* SuperPNG_About_Controller.m */,
@@ -819,6 +818,7 @@
 				2A82C38F1954D13900EEC94C /* SuperPNG_OutUI.xib */,
 				2A82C3901954D13900EEC94C /* SuperPNG_OutUI_Controller.h */,
 				2A82C3911954D13900EEC94C /* SuperPNG_OutUI_Controller.m */,
+				2A82C39F1954D13900EEC94C /* SuperPNG_UI_Cocoa.mm */,
 			);
 			path = mac;
 			sourceTree = "<group>";
