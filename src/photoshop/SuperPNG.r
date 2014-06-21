@@ -233,7 +233,13 @@ resource 'aete' (ResourceID, plugInName " dictionary", purgeable)
 				keyPNGalpha,
 				typeEnumerated,
 				"Source of the alpha channel",
-				flagsSingleProperty
+				flagsSingleProperty,
+				
+				"Clean Transparent",
+				keyPNGcleanTransparent,
+				typeBoolean,
+				"Clear areas where alpha is 0",
+				flagsSingleProperty,
 			},
 			{},
 		},

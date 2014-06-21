@@ -38,6 +38,7 @@
 #define keyPNGinterlace			'pngI'
 #define keyPNGmeta				'pngM'
 #define keyPNGalpha				'pngA'
+#define keyPNGcleanTransparent	'pngX'
 
 #define typeAlphaChannel		'alfT'
 

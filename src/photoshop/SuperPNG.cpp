@@ -75,6 +75,7 @@ static void InitGlobals(Ptr globalPtr)
 	gOptions.interlace  		= PNG_INTERLACE_NONE;
 	gOptions.metadata			= TRUE;
 	gOptions.alpha				= PNG_ALPHA_TRANSPARENCY;
+	gOptions.clean_transparent	= FALSE;
 }
 
 Handle myNewHandle(GPtr globals, const int32 inSize)
@@ -318,7 +319,9 @@ static void DoReadFinish(GPtr globals)
 
 }
 
+
 #pragma mark-
+
 
 static void DoOptionsPrepare(GPtr globals)
 {
@@ -397,10 +400,11 @@ static void DoOptionsStart(GPtr globals)
 	
 		SuperPNG_OutUI_Data params;
 		
-		params.compression	= ParamsToDialog(gOptions.compression, gOptions.filter, gOptions.strategy);
-		params.interlace	= gOptions.interlace;
-		params.metadata		= gOptions.metadata;
-		params.alpha		= (DialogAlpha)gOptions.alpha;
+		params.compression		= ParamsToDialog(gOptions.compression, gOptions.filter, gOptions.strategy);
+		params.interlace		= gOptions.interlace;
+		params.metadata			= gOptions.metadata;
+		params.alpha			= (DialogAlpha)gOptions.alpha;
+		params.clean_transparent = gOptions.clean_transparent;
 	
 	
 	#ifdef __PIMac__
@@ -417,9 +421,10 @@ static void DoOptionsStart(GPtr globals)
 		if(result)
 		{
 			DialogToParams(params.compression, &gOptions.compression, &gOptions.filter, &gOptions.strategy);
-			gOptions.interlace	= params.interlace;
-			gOptions.metadata	= params.metadata;
-			gOptions.alpha		= params.alpha;
+			gOptions.interlace			= params.interlace;
+			gOptions.metadata			= params.metadata;
+			gOptions.alpha				= params.alpha;
+			gOptions.clean_transparent	= params.clean_transparent;
 			
 			WriteParams(globals, &gOptions);
 			WriteScriptParamsOnWrite(globals);

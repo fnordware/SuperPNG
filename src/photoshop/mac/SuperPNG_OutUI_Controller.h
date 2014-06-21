@@ -36,11 +36,13 @@
 	IBOutlet NSWindow *theWindow;
 	IBOutlet NSMatrix *compressionMatrix;
 	IBOutlet NSMatrix *alphaMatrix;
+	IBOutlet NSButton *cleanTransparentCheckbox;
 	IBOutlet NSButton *interlaceCheckbox;
 	IBOutlet NSButton *metadataCheckbox;
 }
 - (id)init:(DialogCompression)compression
 	alpha:(DialogAlpha)the_alpha
+	clean_transparent:(BOOL)clean_transparent
 	interlace:(BOOL)do_interlace
 	metadata:(BOOL)do_metadata
 	have_transparency:(BOOL)has_transparency
@@ -49,10 +51,13 @@
 - (IBAction)clickedOK:(id)sender;
 - (IBAction)clickedCancel:(id)sender;
 
+- (IBAction)trackAlpha:(id)sender;
+
 - (NSWindow *)getWindow;
 
 - (DialogCompression)getCompression;
 - (DialogAlpha)getAlpha;
+- (BOOL)getCleanTransparent;
 - (BOOL)getInterlace;
 - (BOOL)getMetadata;
 

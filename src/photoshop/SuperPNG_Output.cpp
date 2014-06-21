@@ -148,11 +148,11 @@ ReadICCXYZ(cmsHPROFILE hProfile, cmsTagSignature sig, cmsCIEXYZ *Value, cmsBool 
 static cmsBool
 cmsTakeColorants(cmsCIEXYZTRIPLE *Dest, cmsHPROFILE hProfile)
 {
-       if (ReadICCXYZ(hProfile, cmsSigRedColorantTag, &Dest -> Red, TRUE) < 0) return FALSE;
-       if (ReadICCXYZ(hProfile, cmsSigGreenColorantTag, &Dest -> Green, TRUE) < 0) return FALSE;
-       if (ReadICCXYZ(hProfile, cmsSigBlueColorantTag, &Dest -> Blue, TRUE) < 0) return FALSE;
+	if (ReadICCXYZ(hProfile, cmsSigRedColorantTag, &Dest -> Red, TRUE) < 0) return FALSE;
+	if (ReadICCXYZ(hProfile, cmsSigGreenColorantTag, &Dest -> Green, TRUE) < 0) return FALSE;
+	if (ReadICCXYZ(hProfile, cmsSigBlueColorantTag, &Dest -> Blue, TRUE) < 0) return FALSE;
 
-       return TRUE;
+	return TRUE;
 }
 
 
@@ -540,12 +540,79 @@ static void png_init_write(GPtr globals, png_structp *png_ptr, png_infop *info_p
 }
 
 
+template <typename T>
+struct RGBApixel {
+	T r;
+	T g;
+	T b;
+	T a;
+};
+
+typedef RGBApixel<unsigned8> RGBApixel8;
+typedef RGBApixel<unsigned16> RGBApixel16;
+
+
+template <typename T>
+struct YApixel {
+	T y;
+	T a;
+};
+
+typedef YApixel<unsigned8> YApixel8;
+typedef YApixel<unsigned16> YApixel16;
+
+
+template <typename T>
+static void CleanRGBA(T *pix, int64 len)
+{
+	while(len--)
+	{
+		if(pix->a == 0)
+		{
+			pix->r = pix->g = pix->b = 0;
+		}
+		
+		pix++;
+	}
+}
+
+
+template <typename T>
+static void CleanYA(T *pix, int64 len)
+{
+	while(len--)
+	{
+		if(pix->a == 0)
+		{
+			pix->y = 0;
+		}
+		
+		pix++;
+	}
+}
+
+
+static void CleanTransparent(GPtr globals, int num_channels, int64 len)
+{
+	if(num_channels == 4)
+	{
+		if(gStuff->depth == 16)
+			CleanRGBA((RGBApixel16 *)gPixelData, len);
+		else if(gStuff->depth == 8)
+			CleanRGBA((RGBApixel8 *)gPixelData, len);
+	}
+	else if(num_channels == 2)
+	{
+		if(gStuff->depth == 16)
+			CleanYA((YApixel16 *)gPixelData, len);
+		else if(gStuff->depth == 8)
+			CleanYA((YApixel8 *)gPixelData, len);
+	}
+}
+
+
 void SuperPNG_WriteFile(GPtr globals)
 {
-	png_structp png_ptr;
-	png_infop info_ptr;
-	
-	
 	if(gStuff->HostSupports32BitCoordinates && gStuff->imageSize32.h && gStuff->imageSize32.v)
 		gStuff->PluginUsing32BitCoordinates = TRUE;
 		
@@ -626,9 +693,10 @@ void SuperPNG_WriteFile(GPtr globals)
 	}
 
 
-
-
 	// Set up the PNG pointers
+	png_structp png_ptr;
+	png_infop info_ptr;
+	
 	png_init_write(globals, &png_ptr, &info_ptr);
 
 
@@ -789,8 +857,17 @@ void SuperPNG_WriteFile(GPtr globals)
 			}
 			
 			
+			if(gOptions.clean_transparent)
+			{
+				const int64 pixels = (int64)width * (int64)height;
+				
+				CleanTransparent(globals, num_channels, pixels);
+			}
+			
+			
 			if(gStuff->depth == 16)
 			{
+				// Convert Adobe 16-bit to full 16-bit and swap endian
 				int64 samples = (int64)width * (int64)height * (int64)num_channels;
 				
 				unsigned16 *pix = (unsigned16 *)gPixelData;
@@ -858,6 +935,14 @@ void SuperPNG_WriteFile(GPtr globals)
 					PixelMemoryDesc memDesc = { (char *)gPixelData + ((num_channels - 1) * plane_bytes), gRowBytes * 8, col_bytes * 8, 0, bit_depth };					
 				
 					gResult = ReadProc(alpha_channel->port, &scaling, &writeRect, &memDesc, &wroteRect);
+				}
+				
+				
+				if(gOptions.clean_transparent)
+				{
+					const int64 pixels = (int64)width * (int64)block_height;
+					
+					CleanTransparent(globals, num_channels, pixels);
 				}
 				
 				

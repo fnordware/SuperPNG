@@ -93,6 +93,11 @@ Boolean ReadScriptParamsOnWrite(GPtr globals)
 							PIGetEnum(token, &ostypeStoreValue);
 							gOptions.alpha = KeyToAlpha(ostypeStoreValue);
 							break;
+							
+					case keyPNGcleanTransparent:
+							PIGetBool(token, &boolStoreValue);
+							gOptions.clean_transparent = boolStoreValue;
+							break;
 				}
 			}
 
@@ -143,11 +148,14 @@ OSErr WriteScriptParamsOnWrite(GPtr globals)
 			PIPutBool(token, keyPNGinterlace, gOptions.interlace);
 			PIPutBool(token, keyPNGmeta, gOptions.metadata);
 			PIPutEnum(token, keyPNGalpha, typeAlphaChannel, AlphaToKey(gOptions.alpha));
+			
+			if(gOptions.alpha != PNG_ALPHA_NONE)
+				PIPutBool(token, keyPNGcleanTransparent, gOptions.clean_transparent);
+			
 			gotErr = CloseWriter(&token); /* closes and sets dialog optional */
 			/* done.  Now pass handle on to Photoshop */
 		}
 	}
 	return gotErr;
 }
-
 

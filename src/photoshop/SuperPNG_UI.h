@@ -56,6 +56,7 @@ typedef struct {
 	bool				interlace;
 	bool				metadata;
 	DialogAlpha			alpha;
+	bool				clean_transparent;
 } SuperPNG_OutUI_Data;
 
 // SuperPNG UI

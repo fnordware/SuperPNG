@@ -34,6 +34,7 @@
 
 - (id)init:(DialogCompression)compression
 	alpha:(DialogAlpha)the_alpha
+	clean_transparent:(BOOL)clean_transparent
 	interlace:(BOOL)do_interlace
 	metadata:(BOOL)do_metadata
 	have_transparency:(BOOL)has_transparency
@@ -45,6 +46,7 @@
 		return nil;
 
 	[compressionMatrix selectCellAtRow:0 column:(NSInteger)compression];
+	[cleanTransparentCheckbox setState:(clean_transparent ? NSOnState : NSOffState)];
 	[interlaceCheckbox setState:(do_interlace ? NSOnState : NSOffState)];
 	[metadataCheckbox setState:(do_metadata ? NSOnState : NSOffState)];
 	
@@ -75,6 +77,8 @@
 
 	[alphaMatrix selectCellAtRow:(NSInteger)the_alpha column:0];
 
+	[self trackAlpha:self];
+	
 
 	[theWindow center];
 	
@@ -89,33 +93,39 @@
     [NSApp abortModal];
 }
 
+- (IBAction)trackAlpha:(id)sender {
+	const BOOL enable_clean = ([self getAlpha] != DIALOG_ALPHA_NONE);
+	
+	[cleanTransparentCheckbox setEnabled:enable_clean];
+}
+
 - (NSWindow *)getWindow {
 	return theWindow;
 }
 
 - (DialogCompression)getCompression {
-	if([[compressionMatrix cellAtRow:0 column:0] state] == NSOnState)
-		return DIALOG_COMPRESSION_NONE;
-	else if([[compressionMatrix cellAtRow:0 column:1] state] == NSOnState)
-		return DIALOG_COMPRESSION_LOW;
-	else if([[compressionMatrix cellAtRow:0 column:2] state] == NSOnState)
-		return DIALOG_COMPRESSION_NORMAL;
-	else if([[compressionMatrix cellAtRow:0 column:3] state] == NSOnState)
-		return DIALOG_COMPRESSION_HIGH;
-	else
-		return DIALOG_COMPRESSION_NORMAL;
+	switch([compressionMatrix selectedColumn])
+	{
+		case 0:		return DIALOG_COMPRESSION_NONE;
+		case 1:		return DIALOG_COMPRESSION_LOW;
+		case 2:		return DIALOG_COMPRESSION_NORMAL;
+		case 3:		return DIALOG_COMPRESSION_HIGH;
+		default:	return DIALOG_COMPRESSION_HIGH;
+	}
 }
 
 - (DialogAlpha)getAlpha {
-	// got to be a better way to do this, right?
-	if([[alphaMatrix cellAtRow:0 column:0] state] == NSOnState)
-		return DIALOG_ALPHA_NONE;
-	else if([[alphaMatrix cellAtRow:1 column:0] state] == NSOnState)
-		return DIALOG_ALPHA_TRANSPARENCY;
-	else if([[alphaMatrix cellAtRow:2 column:0] state] == NSOnState)
-		return DIALOG_ALPHA_CHANNEL;
-	else
-		return DIALOG_ALPHA_NONE;
+	switch([alphaMatrix selectedRow])
+	{
+		case 0:		return DIALOG_ALPHA_NONE;
+		case 1:		return DIALOG_ALPHA_TRANSPARENCY;
+		case 2:		return DIALOG_ALPHA_CHANNEL;
+		default:	return DIALOG_ALPHA_NONE;
+	}
+}
+
+- (BOOL)getCleanTransparent {
+	return ([cleanTransparentCheckbox state] == NSOnState);
 }
 
 - (BOOL)getInterlace {

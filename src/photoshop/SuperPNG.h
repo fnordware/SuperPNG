@@ -79,6 +79,7 @@ typedef struct {
 	A_Boolean	interlace;
 	A_Boolean	metadata;
 	PNG_Alpha	alpha;
+	A_Boolean	clean_transparent;
 	
 } SuperPNG_outData;
 

@@ -164,6 +164,7 @@ SuperPNG_OutUI(
 	{
 		SuperPNG_OutUI_Controller *ui_controller = [[ui_controller_class alloc] init:params->compression
 														alpha:params->alpha
+														clean_transparent:params->clean_transparent
 														interlace:params->interlace
 														metadata:params->metadata
 														have_transparency:have_transparency
@@ -178,10 +179,11 @@ SuperPNG_OutUI(
 				
 				if(modal_result == NSRunStoppedResponse)
 				{
-					params->compression	= [ui_controller getCompression];
-					params->alpha		= [ui_controller getAlpha];
-					params->interlace	= [ui_controller getInterlace];
-					params->metadata	= [ui_controller getMetadata];
+					params->compression			= [ui_controller getCompression];
+					params->alpha				= [ui_controller getAlpha];
+					params->clean_transparent	= [ui_controller getCleanTransparent];
+					params->interlace			= [ui_controller getInterlace];
+					params->metadata			= [ui_controller getMetadata];
 					
 					result = true;
 				}
