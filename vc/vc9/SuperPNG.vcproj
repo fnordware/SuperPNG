@@ -409,7 +409,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\win\photoshop\SuperPNG_InUI_Win.cpp"
+				RelativePath="..\..\src\photoshop\win\SuperPNG_InUI_Win.cpp"
 				>
 			</File>
 			<File
@@ -417,7 +417,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\win\photoshop\SuperPNG_OutUI_Win.cpp"
+				RelativePath="..\..\src\photoshop\win\SuperPNG_OutUI_Win.cpp"
 				>
 			</File>
 			<File
