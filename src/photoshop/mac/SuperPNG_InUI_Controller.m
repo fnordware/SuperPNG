@@ -41,22 +41,11 @@
 	if(!([NSBundle loadNibNamed:@"SuperPNG_InUI" owner:self]))
 		return nil;
 	
-	if(the_alpha == DIALOG_ALPHA_TRANSPARENCY)
-	{
-		[transparentRadio setState:NSOnState];
-		[channelRadio setState:NSOffState];
-		[multCheckbox setEnabled:FALSE];
-	}
-	else
-	{
-		[transparentRadio setState:NSOffState];
-		[channelRadio setState:NSOnState];
-		[multCheckbox setEnabled:TRUE];
-	}
-	
-	
+	[alphaMatrix selectCellAtRow:(NSInteger)the_alpha - 1 column:0];
 	[multCheckbox setState:(mult ? NSOnState : NSOffState)];
 	[alwaysCheckbox setState:(always ? NSOnState : NSOffState)];
+	
+	[self trackAlpha:self];
 	
 	[theWindow center];
 	
@@ -72,7 +61,7 @@
 }
 
 - (IBAction)clickedSetDefaults:(id)sender {
-	char alphaMode_char = (([transparentRadio state] == NSOnState) ? DIALOG_ALPHA_TRANSPARENCY : DIALOG_ALPHA_CHANNEL);
+	char alphaMode_char = [self getAlpha];
 	CFNumberRef alphaMode = CFNumberCreate(kCFAllocatorDefault, kCFNumberCharType, &alphaMode_char);
 	CFBooleanRef mult =  (([multCheckbox state] == NSOnState) ? kCFBooleanTrue : kCFBooleanFalse);
 	CFBooleanRef always =  (([alwaysCheckbox state] == NSOnState) ? kCFBooleanTrue : kCFBooleanFalse);
@@ -89,17 +78,9 @@
 }
 
 - (IBAction)trackAlpha:(id)sender {
-	if(sender == transparentRadio)
-	{
-		[channelRadio setState:NSOffState];
-		[multCheckbox setEnabled:FALSE];
-	}
-		
-	if(sender == channelRadio)
-	{
-		[transparentRadio setState:NSOffState];
-		[multCheckbox setEnabled:TRUE];
-	}
+	const BOOL enable_mult = ([self getAlpha] == DIALOG_ALPHA_CHANNEL);
+	
+	[multCheckbox setEnabled:enable_mult];
 }
 
 - (NSWindow *)getWindow {
@@ -107,12 +88,12 @@
 }
 
 - (DialogAlpha)getAlpha {
-	if([transparentRadio state] == NSOnState)
-		return DIALOG_ALPHA_TRANSPARENCY;
-	else if([channelRadio state] == NSOnState)
-		return DIALOG_ALPHA_CHANNEL;
-	else
-		return DIALOG_ALPHA_TRANSPARENCY;
+	switch([alphaMatrix selectedRow])
+	{
+		case 0:		return DIALOG_ALPHA_TRANSPARENCY;
+		case 1:		return DIALOG_ALPHA_CHANNEL;
+		default:	return DIALOG_ALPHA_TRANSPARENCY;
+	}
 }
 
 - (BOOL)getMult {
