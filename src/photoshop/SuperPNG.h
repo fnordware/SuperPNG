@@ -30,7 +30,6 @@
 #ifndef __SuperPNG_H__
 #define __SuperPNG_H__
 
-//#include "PIDefines.h"
 #include "PIFormat.h"
 #include "PIUtilities.h"
 
@@ -55,7 +54,7 @@
 #endif
 
 
-typedef int32_t A_long;
+typedef int A_long;
 typedef unsigned char A_Boolean;
 typedef unsigned char A_u_char;
 
