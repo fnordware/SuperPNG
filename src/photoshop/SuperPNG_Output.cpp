@@ -372,8 +372,6 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 								}
 							}
 						}
-
-						cmsFreeToneCurve(gammaTable);
 					}
 				}
 				
