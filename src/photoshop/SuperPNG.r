@@ -240,6 +240,19 @@ resource 'aete' (ResourceID, plugInName " dictionary", purgeable)
 				typeBoolean,
 				"Clear areas where alpha is 0",
 				flagsSingleProperty,
+				
+				"Smart Quantize",
+				keyPNGpngquant,
+				typeBoolean,
+				"Quantize and save and PNG8",
+				flagsSingleProperty,
+				
+				"Quantize Quality",
+				keyPNGquantQuality,
+				typeInteger,
+				"Quality of the Quantization",
+				flagsSingleProperty,
+
 			},
 			{},
 		},

@@ -25,6 +25,7 @@
 		2A82C6E81954E90800EEC94C /* liblibpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A82C6E71954E8F900EEC94C /* liblibpng.a */; };
 		2A82C8821954E9C000EEC94C /* liblcms.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A82C8811954E9B900EEC94C /* liblcms.a */; };
 		2A82CA371954EA7E00EEC94C /* libzlib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A82CA361954EA7A00EEC94C /* libzlib.a */; };
+		2A82D2DF1957519400EEC94C /* libpngquant.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A82D2DE1957518B00EEC94C /* libpngquant.a */; };
 		64126C2B09F979EA006DF4E6 /* PIUSuites.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 64126C2A09F979EA006DF4E6 /* PIUSuites.cpp */; };
 		64126C3509F97A19006DF4E6 /* PIUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 64126C3409F97A19006DF4E6 /* PIUtilities.cpp */; };
 		646B5CAA10D31664001A7C6E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 646B5CA910D31664001A7C6E /* Cocoa.framework */; };
@@ -77,6 +78,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = zlib;
+		};
+		2A82D2DD1957518B00EEC94C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A82D2D91957518B00EEC94C /* pngquant.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC046055464E500DB518D /* libpngquant.a */;
+			remoteInfo = pngquant;
+		};
+		2A82D2E0195751A000EEC94C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A82D2D91957518B00EEC94C /* pngquant.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC045055464E500DB518D /* pngquant */;
+			remoteInfo = pngquant;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -151,6 +166,7 @@
 		2A82C6E21954E8F900EEC94C /* libpng.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libpng.xcodeproj; path = ext/libpng.xcodeproj; sourceTree = "<group>"; };
 		2A82C8791954E9B900EEC94C /* lcms.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = lcms.xcodeproj; path = ext/lcms.xcodeproj; sourceTree = "<group>"; };
 		2A82CA2E1954EA7A00EEC94C /* zlib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = zlib.xcodeproj; path = ext/zlib.xcodeproj; sourceTree = "<group>"; };
+		2A82D2D91957518B00EEC94C /* pngquant.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = pngquant.xcodeproj; path = ext/pngquant.xcodeproj; sourceTree = "<group>"; };
 		6412691809F974D9006DF4E6 /* ADSP.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ADSP.h; path = /Developer/Headers/FlatCarbon/ADSP.h; sourceTree = "<absolute>"; };
 		6412691909F974D9006DF4E6 /* AEDataModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AEDataModel.h; path = /Developer/Headers/FlatCarbon/AEDataModel.h; sourceTree = "<absolute>"; };
 		6412691A09F974D9006DF4E6 /* AEDataModel.r */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.rez; name = AEDataModel.r; path = /Developer/Headers/FlatCarbon/AEDataModel.r; sourceTree = "<absolute>"; };
@@ -686,6 +702,7 @@
 				2A82C6E81954E90800EEC94C /* liblibpng.a in Frameworks */,
 				2A82C8821954E9C000EEC94C /* liblcms.a in Frameworks */,
 				2A82CA371954EA7E00EEC94C /* libzlib.a in Frameworks */,
+				2A82D2DF1957519400EEC94C /* libpngquant.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -698,6 +715,7 @@
 				2A82C3861954D13900EEC94C /* photoshop */,
 				2A82C6E21954E8F900EEC94C /* libpng.xcodeproj */,
 				2A82CA2E1954EA7A00EEC94C /* zlib.xcodeproj */,
+				2A82D2D91957518B00EEC94C /* pngquant.xcodeproj */,
 				2A82C8791954E9B900EEC94C /* lcms.xcodeproj */,
 				64126B7009F97565006DF4E6 /* common */,
 				64126AD309F9751C006DF4E6 /* photoshopapi */,
@@ -843,6 +861,14 @@
 			isa = PBXGroup;
 			children = (
 				2A82CA361954EA7A00EEC94C /* libzlib.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2A82D2DA1957518B00EEC94C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2A82D2DE1957518B00EEC94C /* libpngquant.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1457,6 +1483,7 @@
 				2A82C6EA1954E91200EEC94C /* PBXTargetDependency */,
 				2A82C8841954E9C900EEC94C /* PBXTargetDependency */,
 				2A82CA391954EA8800EEC94C /* PBXTargetDependency */,
+				2A82D2E1195751A000EEC94C /* PBXTargetDependency */,
 			);
 			name = SuperPNG;
 			productInstallPath = "$(HOME)/Library/Bundles";
@@ -1491,6 +1518,10 @@
 					ProjectRef = 2A82C6E21954E8F900EEC94C /* libpng.xcodeproj */;
 				},
 				{
+					ProductGroup = 2A82D2DA1957518B00EEC94C /* Products */;
+					ProjectRef = 2A82D2D91957518B00EEC94C /* pngquant.xcodeproj */;
+				},
+				{
 					ProductGroup = 2A82CA2F1954EA7A00EEC94C /* Products */;
 					ProjectRef = 2A82CA2E1954EA7A00EEC94C /* zlib.xcodeproj */;
 				},
@@ -1522,6 +1553,13 @@
 			fileType = archive.ar;
 			path = libzlib.a;
 			remoteRef = 2A82CA351954EA7A00EEC94C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		2A82D2DE1957518B00EEC94C /* libpngquant.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libpngquant.a;
+			remoteRef = 2A82D2DD1957518B00EEC94C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -1592,6 +1630,11 @@
 			name = zlib;
 			targetProxy = 2A82CA381954EA8800EEC94C /* PBXContainerItemProxy */;
 		};
+		2A82D2E1195751A000EEC94C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = pngquant;
+			targetProxy = 2A82D2E0195751A000EEC94C /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -1621,6 +1664,7 @@
 					"$(inherited)",
 					ext,
 					../../ext/libpng,
+					../../ext/pngquant/lib,
 					../../ext/lcms/include,
 					../../ext/lcms/src,
 				);
@@ -1679,6 +1723,7 @@
 					"$(inherited)",
 					ext,
 					../../ext/libpng,
+					../../ext/pngquant/lib,
 					../../ext/lcms/include,
 					../../ext/lcms/src,
 				);

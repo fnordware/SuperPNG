@@ -30,6 +30,8 @@
 
 #include "SuperPNG.h"
 
+#include "libimagequant.h"
+
 #include "lcms2_internal.h"
 
 #include <stdlib.h>
@@ -611,6 +613,31 @@ static void CleanTransparent(GPtr globals, int num_channels, int64 len)
 }
 
 
+typedef struct {
+	unsigned8 *buf;
+	size_t rowbytes;
+} RGBbuf;
+
+static void rgb2rgba_callback(liq_color row_out[], int row, int width, void* user_info)
+{
+	RGBbuf *rgb = (RGBbuf *)user_info;
+	
+	unsigned8 *in_pix = rgb->buf + (rgb->rowbytes * row);
+	
+	liq_color *out_pix = row_out;
+	
+	while(width--)
+	{
+		out_pix->r = *in_pix++;
+		out_pix->g = *in_pix++;
+		out_pix->b = *in_pix++;
+		out_pix->a = 255;
+		
+		out_pix++;
+	}
+}
+
+
 void SuperPNG_WriteFile(GPtr globals)
 {
 	if(gStuff->HostSupports32BitCoordinates && gStuff->imageSize32.h && gStuff->imageSize32.v)
@@ -654,7 +681,7 @@ void SuperPNG_WriteFile(GPtr globals)
 		num_channels = (use_alpha ? 2 : 1);
 		color_type = (use_alpha ? PNG_COLOR_TYPE_GRAY_ALPHA : PNG_COLOR_TYPE_GRAY);
 	}
-	else //  Assuming RGB if not greyscale
+	else // Assuming RGB if not greyscale
 	{
 		assert(gStuff->planes >= 3);
 	
@@ -690,6 +717,24 @@ void SuperPNG_WriteFile(GPtr globals)
 	{
 		bit_depth = 8;
 		plane_bytes = 1;
+	}
+	
+	
+	if(gOptions.pngquant)
+	{
+		if(gStuff->imageMode != plugInModeRGBColor || gStuff->planes < 3 || gStuff->depth != 8)
+		{
+			gOptions.pngquant = FALSE;
+		}
+		else
+		{
+			color_type = PNG_COLOR_TYPE_PALETTE;
+			
+			if(gOptions.quant_quality < 0)
+				gOptions.quant_quality = 0;
+			else if(gOptions.quant_quality > 100)
+				gOptions.quant_quality = 100;
+		}
 	}
 
 
@@ -792,20 +837,10 @@ void SuperPNG_WriteFile(GPtr globals)
 	//	png_set_swap(png_ptr);
 #endif
 	
-	// Set the various Meta Data chunks
 	if(gOptions.metadata)
 		WriteMetadata(globals, png_ptr, info_ptr);
 
-		
-	
-
-	// Write the PNG header.
-
-	png_write_info(png_ptr, info_ptr);
-	
-	
-	// Set basic image parameters.	
-		
+				
 	gStuff->loPlane = 0;
 	gStuff->hiPlane = hi_plane;
 	gStuff->colBytes = col_bytes;
@@ -829,7 +864,7 @@ void SuperPNG_WriteFile(GPtr globals)
 	}
 		
 	
-	if(interlace_type == PNG_INTERLACE_ADAM7) 
+	if(interlace_type == PNG_INTERLACE_ADAM7 || gOptions.pngquant) 
 	{
 		// Load the whole image into RAM and write it all at once. 
 		
@@ -857,39 +892,134 @@ void SuperPNG_WriteFile(GPtr globals)
 			}
 			
 			
-			if(gOptions.clean_transparent)
+			if(gResult == noErr)
 			{
-				const int64 pixels = (int64)width * (int64)height;
-				
-				CleanTransparent(globals, num_channels, pixels);
-			}
-			
-			
-			if(gStuff->depth == 16)
-			{
-				// Convert Adobe 16-bit to full 16-bit and swap endian
-				int64 samples = (int64)width * (int64)height * (int64)num_channels;
-				
-				unsigned16 *pix = (unsigned16 *)gPixelData;
-				
-				while(samples--)
+				if(gOptions.clean_transparent)
 				{
-					*pix = ByteSwap( Promote(*pix) );
-					pix++;
+					const int64 pixels = (int64)width * (int64)height;
+					
+					CleanTransparent(globals, num_channels, pixels);
+				}
+				
+				
+				if(gOptions.pngquant)
+				{
+					liq_attr *attr = liq_attr_create();
+					
+					liq_set_quality(attr, 0, gOptions.quant_quality);
+				
+					liq_image *image = NULL;
+					
+					if(gStuff->planes == 4)
+					{
+						image = liq_image_create_rgba(attr, gPixelData, width, height, 0);
+					}
+					else if(gStuff->planes == 3)
+					{
+						RGBbuf buf = { (unsigned8 *)gPixelData, gRowBytes };
+						
+						image = liq_image_create_custom(attr, rgb2rgba_callback, &buf, width, height, 0);
+					}
+					
+					liq_result *result = liq_quantize_image(attr, image);
+					
+					if(result != NULL)
+					{
+						const size_t pngbuf_rowbytes = sizeof(unsigned8) * width;
+						const size_t pngbuf_size = pngbuf_rowbytes * height;
+						
+						BufferID pngID = 0;
+						
+						gResult = myAllocateBuffer(globals, pngbuf_size, &pngID);
+						
+						if(pngID != 0 && gResult == noErr)
+						{
+							Ptr pngbuf = myLockBuffer(globals, pngID, TRUE);
+							
+							liq_error liq_err = liq_write_remapped_image(result, image, pngbuf, pngbuf_size);
+							
+							if(liq_err == LIQ_OK)
+							{
+								const liq_palette *pal = liq_get_palette(result);
+								
+								png_color palette[PNG_MAX_PALETTE_LENGTH];
+								png_byte trans[PNG_MAX_PALETTE_LENGTH];
+
+								for(int i=0; i < pal->count; i++)
+								{
+									palette[i].red   = pal->entries[i].r;
+									palette[i].green = pal->entries[i].g;
+									palette[i].blue  = pal->entries[i].b;
+									
+									trans[i] = pal->entries[i].a;
+								}
+								
+								if(pal->count <= 128)
+								{
+									png_set_packing(png_ptr);
+									png_set_packswap(png_ptr);
+								}
+								
+								png_set_PLTE(png_ptr, info_ptr, palette, pal->count);
+								
+								if(gStuff->planes == 4)
+									png_set_tRNS(png_ptr, info_ptr, trans, pal->count, NULL);
+								
+								
+								png_write_info(png_ptr, info_ptr);
+								
+								png_bytepp row_pointers = (png_bytepp)png_malloc(png_ptr, height * sizeof(png_bytep));
+								
+								for (int row=0; row < height; row++)
+									row_pointers[row] = (png_bytep)( (char *)pngbuf + (row * pngbuf_rowbytes) );
+								
+
+								png_write_image(png_ptr, row_pointers);
+								
+								
+								png_free(png_ptr, (void *)row_pointers);
+							}
+							
+							myFreeBuffer(globals, pngID);
+						}
+					}
+					else
+						gResult = formatBadParameters;
+					
+					liq_attr_destroy(attr);
+					liq_image_destroy(image);
+					liq_result_destroy(result);
+				}
+				else
+				{
+					if(gStuff->depth == 16)
+					{
+						// Convert Adobe 16-bit to full 16-bit and swap endian
+						int64 samples = (int64)width * (int64)height * (int64)num_channels;
+						
+						unsigned16 *pix = (unsigned16 *)gPixelData;
+						
+						while(samples--)
+						{
+							*pix = ByteSwap( Promote(*pix) );
+							pix++;
+						}
+					}
+
+					png_write_info(png_ptr, info_ptr);
+					
+					png_bytepp row_pointers = (png_bytepp)png_malloc(png_ptr, height * sizeof(png_bytep));
+					
+					for (int row=0; row < height; row++)
+						row_pointers[row] = (png_bytep)( (char *)gPixelData + (row * gRowBytes) );
+					
+
+					png_write_image(png_ptr, row_pointers);
+					
+					
+					png_free(png_ptr, (void *)row_pointers);
 				}
 			}
-			
-
-			png_bytepp row_pointers = (png_bytepp)png_malloc(png_ptr, height * sizeof(png_bytep));
-			
-			for (int row=0; row < height; row++)
-				row_pointers[row] = (png_bytep)( (char *)gPixelData + (row * gRowBytes) );
-			
-
-			png_write_image(png_ptr, row_pointers);
-			
-			
-			png_free(png_ptr, (void *)row_pointers);
 			
 			myFreeBuffer(globals, bufferID);
 			
@@ -899,7 +1029,7 @@ void SuperPNG_WriteFile(GPtr globals)
 	else
 	{
 		// write some reasonable number of scanlines at a time
-		int num_scanlines = (gStuff->tileHeight == 0 ? 256 : gStuff->tileHeight);
+		const int num_scanlines = (gStuff->tileHeight == 0 ? 256 : gStuff->tileHeight);
 		
 		BufferID bufferID = 0;
 		
@@ -907,6 +1037,9 @@ void SuperPNG_WriteFile(GPtr globals)
 		
 		if(gResult == noErr && bufferID != 0)
 		{
+			png_write_info(png_ptr, info_ptr);
+			
+		
 			gStuff->data = gPixelData = myLockBuffer(globals, bufferID, TRUE);
 		
 			png_bytepp row_pointers = (png_bytepp)png_malloc(png_ptr, num_scanlines * sizeof(png_bytep));

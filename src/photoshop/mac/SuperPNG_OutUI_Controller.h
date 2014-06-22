@@ -35,16 +35,22 @@
 @interface SuperPNG_OutUI_Controller : NSObject {
 	IBOutlet NSWindow *theWindow;
 	IBOutlet NSMatrix *compressionMatrix;
+	IBOutlet NSButton *quantizeCheckbox;
+	IBOutlet NSSlider *quantizeSlider;
+	IBOutlet NSTextField *sliderLabel;
 	IBOutlet NSMatrix *alphaMatrix;
 	IBOutlet NSButton *cleanTransparentCheckbox;
 	IBOutlet NSButton *interlaceCheckbox;
 	IBOutlet NSButton *metadataCheckbox;
 }
 - (id)init:(DialogCompression)compression
+	quantize:(BOOL)quantize
+	quantQuality:(NSInteger)quantQuality
 	alpha:(DialogAlpha)the_alpha
 	clean_transparent:(BOOL)clean_transparent
 	interlace:(BOOL)do_interlace
 	metadata:(BOOL)do_metadata
+	isRGB8:(BOOL)isRGB8
 	have_transparency:(BOOL)has_transparency
 	alpha_name:(const char *)alphaName;
 
@@ -52,10 +58,13 @@
 - (IBAction)clickedCancel:(id)sender;
 
 - (IBAction)trackAlpha:(id)sender;
+- (IBAction)trackQuantize:(id)sender;
 
 - (NSWindow *)getWindow;
 
 - (DialogCompression)getCompression;
+- (BOOL)getQuantize;
+- (NSInteger)getQuantizeQuality;
 - (DialogAlpha)getAlpha;
 - (BOOL)getCleanTransparent;
 - (BOOL)getInterlace;

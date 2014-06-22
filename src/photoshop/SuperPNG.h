@@ -80,6 +80,8 @@ typedef struct {
 	A_Boolean	metadata;
 	PNG_Alpha	alpha;
 	A_Boolean	clean_transparent;
+	A_long		quant_quality;
+	A_Boolean	pngquant;
 	
 } SuperPNG_outData;
 

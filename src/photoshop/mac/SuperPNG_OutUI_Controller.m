@@ -33,10 +33,13 @@
 @implementation SuperPNG_OutUI_Controller
 
 - (id)init:(DialogCompression)compression
+	quantize:(BOOL)quantize
+	quantQuality:(NSInteger)quantQuality
 	alpha:(DialogAlpha)the_alpha
 	clean_transparent:(BOOL)clean_transparent
 	interlace:(BOOL)do_interlace
 	metadata:(BOOL)do_metadata
+	isRGB8:(BOOL)isRGB8
 	have_transparency:(BOOL)has_transparency
 	alpha_name:(const char *)alphaName;
 {
@@ -46,10 +49,19 @@
 		return nil;
 
 	[compressionMatrix selectCellAtRow:0 column:(NSInteger)compression];
+	[quantizeCheckbox setState:(quantize ? NSOnState : NSOffState)];
+	[quantizeSlider setIntValue:quantQuality];
 	[cleanTransparentCheckbox setState:(clean_transparent ? NSOnState : NSOffState)];
 	[interlaceCheckbox setState:(do_interlace ? NSOnState : NSOffState)];
 	[metadataCheckbox setState:(do_metadata ? NSOnState : NSOffState)];
 	
+	if(!isRGB8)
+	{
+		[quantizeCheckbox setState:NSOffState];
+		[quantizeCheckbox setEnabled:FALSE];
+	}
+	
+	[self trackQuantize:self];
 	
 	if(!has_transparency)
 	{
@@ -99,6 +111,19 @@
 	[cleanTransparentCheckbox setEnabled:enable_clean];
 }
 
+- (IBAction)trackQuantize:(id)sender {
+	const BOOL enabled = [self getQuantize];
+
+	[quantizeSlider setEnabled:enabled];
+	
+	NSColor *label_color = (enabled ? [NSColor textColor] : [NSColor disabledControlTextColor]);
+	
+	[sliderLabel setTextColor:label_color];
+	
+	[label_color release];
+}
+
+
 - (NSWindow *)getWindow {
 	return theWindow;
 }
@@ -112,6 +137,14 @@
 		case 3:		return DIALOG_COMPRESSION_HIGH;
 		default:	return DIALOG_COMPRESSION_HIGH;
 	}
+}
+
+- (BOOL)getQuantize {
+	return ([quantizeCheckbox state] == NSOnState);
+}
+
+- (NSInteger)getQuantizeQuality {
+	return [quantizeSlider intValue];
 }
 
 - (DialogAlpha)getAlpha {

@@ -148,6 +148,7 @@ SuperPNG_InUI(
 bool
 SuperPNG_OutUI(
 	SuperPNG_OutUI_Data	*params,
+	bool				isRGB8,
 	bool				have_transparency,
 	const char			*alpha_name,
 	const void			*plugHndl,
@@ -163,10 +164,13 @@ SuperPNG_OutUI(
 	if(ui_controller_class)
 	{
 		SuperPNG_OutUI_Controller *ui_controller = [[ui_controller_class alloc] init:params->compression
+														quantize:params->quantize
+														quantQuality:params->quantize_quality
 														alpha:params->alpha
 														clean_transparent:params->clean_transparent
 														interlace:params->interlace
 														metadata:params->metadata
+														isRGB8:isRGB8
 														have_transparency:have_transparency
 														alpha_name:alpha_name];
 		if(ui_controller)
@@ -180,6 +184,8 @@ SuperPNG_OutUI(
 				if(modal_result == NSRunStoppedResponse)
 				{
 					params->compression			= [ui_controller getCompression];
+					params->quantize			= [ui_controller getQuantize];
+					params->quantize_quality	= [ui_controller getQuantizeQuality];
 					params->alpha				= [ui_controller getAlpha];
 					params->clean_transparent	= [ui_controller getCleanTransparent];
 					params->interlace			= [ui_controller getInterlace];
