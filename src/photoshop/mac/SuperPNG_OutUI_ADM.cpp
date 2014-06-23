@@ -34,13 +34,6 @@
 
 #include "PIUSuites.h"
 
-#include "ADMVersion.h"
-#include "ADMDialog.h"
-#include "ADMItem.h"
-#include "ADMNotifier.h"
-#include "ADMDrawer.h"
-#include "ADMImage.h"
-
 #include "SuperPNG_version.h"
 
 #include "math.h"
@@ -49,6 +42,14 @@
 // Only building this on 32-bit (non-Cocoa) architectures
 // ==========
 #if !__LP64__
+
+#include "ADMVersion.h"
+#include "ADMDialog.h"
+#include "ADMItem.h"
+#include "ADMNotifier.h"
+#include "ADMDrawer.h"
+#include "ADMImage.h"
+
 
 static AutoSuite<ADMDialogSuite3> sADMDialog(kADMDialogSuite, kADMDialogSuiteVersion3);
 static AutoSuite<ADMItemSuite4> sADMItem(kADMItemSuite, kADMItemSuiteVersion4);

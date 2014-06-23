@@ -991,7 +991,7 @@ void SuperPNG_WriteFile(GPtr globals)
 									
 									png_bytepp row_pointers = (png_bytepp)png_malloc(png_ptr, height * sizeof(png_bytep));
 									
-									for (int row=0; row < height; row++)
+									for(int row=0; row < height; row++)
 										row_pointers[row] = (png_bytep)( (char *)pngbuf + (row * pngbuf_rowbytes) );
 									
 
@@ -1037,7 +1037,7 @@ void SuperPNG_WriteFile(GPtr globals)
 					
 					png_bytepp row_pointers = (png_bytepp)png_malloc(png_ptr, height * sizeof(png_bytep));
 					
-					for (int row=0; row < height; row++)
+					for(int row=0; row < height; row++)
 						row_pointers[row] = (png_bytep)( (char *)gPixelData + (row * gRowBytes) );
 					
 
@@ -1071,7 +1071,7 @@ void SuperPNG_WriteFile(GPtr globals)
 		
 			png_bytepp row_pointers = (png_bytepp)png_malloc(png_ptr, num_scanlines * sizeof(png_bytep));
 			
-			for (int row=0; row < num_scanlines; row++)
+			for(int row=0; row < num_scanlines; row++)
 				row_pointers[row] = (png_bytep)( (char *)gPixelData + (row * gRowBytes) );
 		
 		
@@ -1079,8 +1079,8 @@ void SuperPNG_WriteFile(GPtr globals)
 			
 			while(y < height && gResult == noErr)
 			{
-				int high_scanline = minimum<int>(y + num_scanlines - 1, height - 1);
-				int block_height = 1 + high_scanline - y;
+				const int high_scanline = minimum<int>(y + num_scanlines - 1, height - 1);
+				const int block_height = 1 + high_scanline - y;
 				
 				gStuff->theRect.top = gStuff->theRect32.top = y;
 				gStuff->theRect.bottom = gStuff->theRect32.bottom = high_scanline + 1;
