@@ -937,6 +937,8 @@ void SuperPNG_WriteFile(GPtr globals)
 						
 						if(result != NULL)
 						{
+							liq_set_dithering_level(result, 1.0);
+						
 							const size_t pngbuf_rowbytes = sizeof(unsigned8) * width;
 							const size_t pngbuf_size = pngbuf_rowbytes * height;
 							
