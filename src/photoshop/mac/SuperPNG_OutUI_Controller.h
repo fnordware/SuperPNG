@@ -59,6 +59,7 @@
 
 - (IBAction)trackAlpha:(id)sender;
 - (IBAction)trackQuantize:(id)sender;
+- (IBAction)trackQuantQuality:(id)sender;
 
 - (NSWindow *)getWindow;
 
