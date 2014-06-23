@@ -62,6 +62,7 @@
 	}
 	
 	[self trackQuantize:self];
+	[self trackQuantQuality:self];
 	
 	if(!has_transparency)
 	{
@@ -123,6 +124,17 @@
 	[label_color release];
 }
 
+- (IBAction)trackQuantQuality:(id)sender {
+	const NSInteger quality = [self getQuantizeQuality];
+
+	NSString *quality_string = (quality > 95 ? @"Highest Quality" :
+								quality > 65 ? @"High Quality" :
+								quality < 5 ? @"Lowest Quality" :
+								quality < 35 ? @"Low Quality" :
+								@"Medium Quality");
+										
+	[sliderLabel setStringValue:quality_string];
+}
 
 - (NSWindow *)getWindow {
 	return theWindow;

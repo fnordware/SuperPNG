@@ -690,7 +690,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<reference key="NSSuperview" ref="1006"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSSliderCell" key="NSCell" id="1025664085">
-								<int key="NSCellFlags">-2080244224</int>
+								<int key="NSCellFlags">-2079981824</int>
 								<int key="NSCellFlags2">131072</int>
 								<string key="NSContents"/>
 								<reference key="NSControlView" ref="372334699"/>
@@ -707,13 +707,13 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<object class="NSTextField" id="277694252">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{189, 206}, {60, 14}}</string>
+							<string key="NSFrame">{{161, 206}, {118, 14}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="482843168">
 								<int key="NSCellFlags">68288064</int>
 								<int key="NSCellFlags2">138544128</int>
-								<string key="NSContents">Quality</string>
+								<string key="NSContents">Medium Quality</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="277694252"/>
 								<reference key="NSBackgroundColor" ref="31177775"/>
@@ -834,6 +834,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<reference key="destination" ref="277694252"/>
 					</object>
 					<int key="connectionID">53</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">trackQuantQuality:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="372334699"/>
+					</object>
+					<int key="connectionID">54</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1279,7 +1287,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">53</int>
+			<int key="maxID">54</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1294,10 +1302,12 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>clickedCancel:</string>
 							<string>clickedOK:</string>
 							<string>trackAlpha:</string>
+							<string>trackQuantQuality:</string>
 							<string>trackQuantize:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -1311,6 +1321,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>clickedCancel:</string>
 							<string>clickedOK:</string>
 							<string>trackAlpha:</string>
+							<string>trackQuantQuality:</string>
 							<string>trackQuantize:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
@@ -1325,6 +1336,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">trackAlpha:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">trackQuantQuality:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
