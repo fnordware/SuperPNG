@@ -190,7 +190,7 @@ static void DoFilterFile(GPtr globals)
 
 // Transfer settings to and from gStuff->revertInfo
 
-static inline uint32_t SwapLong(uint32_t a)
+static inline unsigned int SwapLong(unsigned int a)
 {
 	return ((a >> 24) | ((a >> 8) & 0xff00) | ((a << 8) & 0xff0000) | (a << 24));
 }
