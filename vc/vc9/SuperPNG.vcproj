@@ -430,10 +430,6 @@
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
 			<File
-				RelativePath=".\resource.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\photoshop\SuperPNG.h"
 				>
 			</File>

@@ -35,13 +35,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-#ifdef __PIWin__
-#include "PIDLLInstance.h"
-#endif
-
-
-extern SPBasicSuite		*sSPBasic;
-extern SPPluginRef		gPlugInRef;
 
 
 void SuperPNG_VerifyFile(GPtr globals)
