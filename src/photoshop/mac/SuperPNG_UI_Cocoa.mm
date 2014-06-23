@@ -36,8 +36,6 @@
 
 #include "SuperPNG_version.h"
 
-#include <Carbon/Carbon.h>
-
 // ==========
 // Only building this on 64-bit (Cocoa) architectures
 // ==========
@@ -87,15 +85,13 @@ SuperPNG_InUI(
 		
 		CFRelease(always_val);
 	}
+	
+	// user can force dialog open by holding shift or option
+	const NSUInteger flags = [[NSApp currentEvent] modifierFlags];
+	const bool shift_key = ( (flags & NSShiftKeyMask) || (flags & NSAlternateKeyMask) );
 
-	// user can force dialog open buy holding shift or option
-    UInt32 keys = GetCurrentEventKeyModifiers();
-	bool option_key = ( (keys & shiftKey) || (keys & rightShiftKey) || (keys & optionKey) || (keys & rightOptionKey) );
-
-
-	if(always_dialog || option_key)
+	if(always_dialog || shift_key)
 	{
-		// do the dialog (or maybe not (but we still load the object to get the prefs)
 		NSString *bundle_id = [NSString stringWithUTF8String:(const char *)plugHndl];
 
 		Class ui_controller_class = [[NSBundle bundleWithIdentifier:bundle_id]
