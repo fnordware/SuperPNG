@@ -710,6 +710,8 @@
 /* Begin PBXProject section */
 		089C1669FE841209C02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = 4FADC23708B4156C00ABE55E /* Build configuration list for PBXProject "SuperPNG" */;
 			compatibilityVersion = "Xcode 2.4";
 			developmentRegion = English;
@@ -922,13 +924,7 @@
 		2A01738E112F17A8005CDE51 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_64_BIT_PRE_XCODE_3_1 = x86_64;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					__PI__,
-					PS_CS4_SDK,
-					NDEBUG,
-				);
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				INFOPLIST_FILE = SuperPNG_Info.plist;
 				PRODUCT_NAME = SuperPNG;
 				REZ_PREFIX_FILE = "$(SRCROOT)/../../ext/photoshopsdk/pluginsdk/samplecode/common/includes/MachOMacrezXcode.h";
@@ -940,8 +936,7 @@
 		4FADC23408B4156C00ABE55E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_64_BIT_PRE_XCODE_3_1 = x86_64;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				INFOPLIST_FILE = SuperPNG_Info.plist;
 				PRODUCT_NAME = SuperPNG;
 				REZ_PREFIX_FILE = "$(SRCROOT)/../../ext/photoshopsdk/pluginsdk/samplecode/common/includes/MachOMacrezXcode.h";
