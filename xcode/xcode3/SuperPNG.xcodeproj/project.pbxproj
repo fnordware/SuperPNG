@@ -83,14 +83,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A82D2D91957518B00EEC94C /* pngquant.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D2AAC046055464E500DB518D /* libpngquant.a */;
+			remoteGlobalIDString = D2AAC046055464E500DB518D;
 			remoteInfo = pngquant;
 		};
 		2A82D2E0195751A000EEC94C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A82D2D91957518B00EEC94C /* pngquant.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* pngquant */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = pngquant;
 		};
 /* End PBXContainerItemProxy section */
@@ -1647,6 +1647,7 @@
 					ppc,
 				);
 				COPY_PHASE_STRIP = YES;
+				ENABLE_OPENMP_SUPPORT = YES;
 				GCC_ALTIVEC_EXTENSIONS = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
@@ -1710,6 +1711,7 @@
 					ppc,
 				);
 				COPY_PHASE_STRIP = NO;
+				ENABLE_OPENMP_SUPPORT = YES;
 				GCC_ALTIVEC_EXTENSIONS = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;

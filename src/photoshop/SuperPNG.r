@@ -49,8 +49,6 @@
 #include "PIDefines.h"
 
 #ifdef __PIMac__
-	#include "Types.r"
-	#include "SysTypes.r"
 	#include "PIGeneral.r"
 #elif defined(__PIWin__)
 	#include "PIGeneral.h"

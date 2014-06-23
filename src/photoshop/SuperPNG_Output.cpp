@@ -907,6 +907,14 @@ void SuperPNG_WriteFile(GPtr globals)
 					liq_attr *attr = liq_attr_create();
 					
 					liq_set_quality(attr, 0, gOptions.quant_quality);
+					
+					// convoluted way of getting the user's speed selection from the dialog
+					const int liq_speed = (gOptions.compression == Z_BEST_COMPRESSION ? 3 :
+											gOptions.compression == Z_NO_COMPRESSION ? 9 :
+											gOptions.filter == PNG_FILTER_SUB ? 7 :
+											5);
+					
+					liq_set_speed(attr, liq_speed);
 				
 					liq_image *image = NULL;
 					
@@ -921,74 +929,91 @@ void SuperPNG_WriteFile(GPtr globals)
 						image = liq_image_create_custom(attr, rgb2rgba_callback, &buf, width, height, 0);
 					}
 					
-					liq_result *result = liq_quantize_image(attr, image);
-					
-					if(result != NULL)
+					if(image != NULL)
 					{
-						const size_t pngbuf_rowbytes = sizeof(unsigned8) * width;
-						const size_t pngbuf_size = pngbuf_rowbytes * height;
+						liq_result *result = liq_quantize_image(attr, image);
 						
-						BufferID pngID = 0;
+						PIUpdateProgress(1, 3);
 						
-						gResult = myAllocateBuffer(globals, pngbuf_size, &pngID);
-						
-						if(pngID != 0 && gResult == noErr)
+						if(result != NULL)
 						{
-							Ptr pngbuf = myLockBuffer(globals, pngID, TRUE);
+							const size_t pngbuf_rowbytes = sizeof(unsigned8) * width;
+							const size_t pngbuf_size = pngbuf_rowbytes * height;
 							
-							liq_error liq_err = liq_write_remapped_image(result, image, pngbuf, pngbuf_size);
+							gResult = TestAbort();
 							
-							if(liq_err == LIQ_OK)
+							BufferID pngID = 0;
+							
+							if(gResult == noErr)
+								gResult = myAllocateBuffer(globals, pngbuf_size, &pngID);
+							
+							if(pngID != 0 && gResult == noErr)
 							{
-								const liq_palette *pal = liq_get_palette(result);
+								Ptr pngbuf = myLockBuffer(globals, pngID, TRUE);
 								
-								png_color palette[PNG_MAX_PALETTE_LENGTH];
-								png_byte trans[PNG_MAX_PALETTE_LENGTH];
-
-								for(int i=0; i < pal->count; i++)
+								liq_error liq_err = liq_write_remapped_image(result, image, pngbuf, pngbuf_size);
+								
+								PIUpdateProgress(2, 3);
+								
+								gResult = TestAbort();
+								
+								if(liq_err == LIQ_OK && gResult == noErr)
 								{
-									palette[i].red   = pal->entries[i].r;
-									palette[i].green = pal->entries[i].g;
-									palette[i].blue  = pal->entries[i].b;
+									const liq_palette *pal = liq_get_palette(result);
 									
-									trans[i] = pal->entries[i].a;
-								}
-								
-								if(pal->count <= 128)
-								{
-									png_set_packing(png_ptr);
-									png_set_packswap(png_ptr);
-								}
-								
-								png_set_PLTE(png_ptr, info_ptr, palette, pal->count);
-								
-								if(gStuff->planes == 4)
-									png_set_tRNS(png_ptr, info_ptr, trans, pal->count, NULL);
-								
-								
-								png_write_info(png_ptr, info_ptr);
-								
-								png_bytepp row_pointers = (png_bytepp)png_malloc(png_ptr, height * sizeof(png_bytep));
-								
-								for (int row=0; row < height; row++)
-									row_pointers[row] = (png_bytep)( (char *)pngbuf + (row * pngbuf_rowbytes) );
-								
+									png_color palette[PNG_MAX_PALETTE_LENGTH];
+									png_byte trans[PNG_MAX_PALETTE_LENGTH];
 
-								png_write_image(png_ptr, row_pointers);
+									for(int i=0; i < pal->count; i++)
+									{
+										palette[i].red   = pal->entries[i].r;
+										palette[i].green = pal->entries[i].g;
+										palette[i].blue  = pal->entries[i].b;
+										
+										trans[i] = pal->entries[i].a;
+									}
+									
+									if(pal->count <= 128)
+									{
+										png_set_packing(png_ptr);
+										png_set_packswap(png_ptr);
+									}
+									
+									png_set_PLTE(png_ptr, info_ptr, palette, pal->count);
+									
+									if(gStuff->planes == 4)
+										png_set_tRNS(png_ptr, info_ptr, trans, pal->count, NULL);
+									
+									
+									png_write_info(png_ptr, info_ptr);
+									
+									png_bytepp row_pointers = (png_bytepp)png_malloc(png_ptr, height * sizeof(png_bytep));
+									
+									for (int row=0; row < height; row++)
+										row_pointers[row] = (png_bytep)( (char *)pngbuf + (row * pngbuf_rowbytes) );
+									
+
+									png_write_image(png_ptr, row_pointers);
+									
+									PIUpdateProgress(3, 3);
+									
+									png_free(png_ptr, (void *)row_pointers);
+								}
 								
-								
-								png_free(png_ptr, (void *)row_pointers);
+								myFreeBuffer(globals, pngID);
 							}
 							
-							myFreeBuffer(globals, pngID);
+							liq_result_destroy(result);
 						}
+						else
+							gResult = formatBadParameters;
+						
+						liq_image_destroy(image);
 					}
 					else
 						gResult = formatBadParameters;
 					
 					liq_attr_destroy(attr);
-					liq_image_destroy(image);
-					liq_result_destroy(result);
 				}
 				else
 				{
