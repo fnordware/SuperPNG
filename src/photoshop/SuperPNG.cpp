@@ -388,6 +388,10 @@ static void DoOptionsStart(GPtr globals)
 	if( ReadScriptParamsOnWrite(globals) )
 	{
 		const bool isRGB8 = (gStuff->imageMode == plugInModeRGBColor && gStuff->depth == 8);
+		
+		if(!isRGB8)
+			gOptions.pngquant = FALSE;
+		
 	
 		bool have_transparency = false;
 		const char *alpha_name = NULL;

@@ -242,7 +242,7 @@ resource 'aete' (ResourceID, plugInName " dictionary", purgeable)
 				"Quantizing",
 				keyPNGpngquant,
 				typeBoolean,
-				"Quantize and save and PNG8",
+				"Quantize and save as PNG8",
 				flagsSingleProperty,
 				
 				"Quantize Quality",
