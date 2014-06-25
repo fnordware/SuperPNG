@@ -7,6 +7,11 @@ You will need to manually add the following to this directory because the owners
 
 * [Photoshop CS5 SDK](http://www.adobe.com/devnet/photoshop/sdk.html)
 
+* [pngquant](http://github.com/pornel/pngquant)
+
+
+To build on Windows, you must us the "msvc" branch of pngquant.
+
 
 If the submodule contents are missing, you should be able to get them by typing:
 

@@ -47,11 +47,15 @@ enum {
 	OUT_Compression_Radio_Low,
 	OUT_Compression_Radio_Normal,
 	OUT_Compression_Radio_High,
+	OUT_Quantize_Check,
+	OUT_Quantize_Quality,
+	OUT_Quantize_Label,
 	OUT_Interlacing_Check,
 	OUT_Metadata_Check,
 	OUT_Alpha_Radio_None,
 	OUT_Alpha_Radio_Transparency,
-	OUT_Alpha_Radio_Channel
+	OUT_Alpha_Radio_Channel,
+	OUT_Clean_Transparent
 };
 
 // sensible Win macros
@@ -60,21 +64,55 @@ enum {
 #define SET_CHECK(ITEM, VAL)	SendMessage(GET_ITEM(ITEM), BM_SETCHECK, (WPARAM)(VAL), (LPARAM)0)
 #define GET_CHECK(ITEM)			SendMessage(GET_ITEM(ITEM), BM_GETCHECK, (WPARAM)0, (LPARAM)0)
 
+#define SET_SLIDER(ITEM, VAL)	SendMessage(GET_ITEM(ITEM),(UINT)TBM_SETPOS, (WPARAM)(BOOL)TRUE, (LPARAM)(VAL));
+#define GET_SLIDER(ITEM)		SendMessage(GET_ITEM(ITEM), TBM_GETPOS, (WPARAM)0, (LPARAM)0 )
+
 #define ENABLE_ITEM(ITEM, ENABLE)	EnableWindow(GetDlgItem(hwndDlg, (ITEM)), (ENABLE));
 
 
 
 static DialogCompression	g_compression = DIALOG_COMPRESSION_NORMAL;
-static bool					g_interlace = FALSE;
-static bool					g_metadata = TRUE;
+static bool					g_quantize = false;
+static int					g_quant_qual = 80;
+static bool					g_interlace = false;
+static bool					g_metadata = true;
 static DialogAlpha			g_alpha = DIALOG_ALPHA_NONE;
+static bool					g_clean_trans = false;
 
+static bool					g_isRGB8 = true;
 static bool					g_have_transparency = false;
 static const char			*g_alpha_name = NULL;
 
 static WORD	g_item_clicked = 0;
 
 
+static void TrackQuantize(HWND hwndDlg)
+{
+	const BOOL enable_slider = GET_CHECK(OUT_Quantize_Check);
+
+	ENABLE_ITEM(OUT_Quantize_Quality, enable_slider);
+	ENABLE_ITEM(OUT_Quantize_Label, enable_slider);
+}
+
+static void TrackSlider(HWND hwndDlg)
+{
+	const int quality = GET_SLIDER(OUT_Quantize_Quality);
+
+	const char *quality_string = (quality > 95 ? "Highest Quality" :
+									quality > 65 ? "High Quality" :
+									quality < 5 ? "Lowest Quality" :
+									quality < 35 ? "Low Quality" :
+									"Medium Quality");
+
+	SetDlgItemText(hwndDlg, OUT_Quantize_Label, quality_string);
+}
+
+static void TrackAlpha(HWND hwndDlg)
+{
+	const BOOL none_checked = GET_CHECK(OUT_Alpha_Radio_None);
+
+	ENABLE_ITEM(OUT_Clean_Transparent, !none_checked);
+}
 
 static BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) 
 { 
@@ -88,6 +126,29 @@ static BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARA
 						g_compression == DIALOG_COMPRESSION_NORMAL ? OUT_Compression_Radio_Normal :
 						g_compression == DIALOG_COMPRESSION_HIGH ? OUT_Compression_Radio_High :
 						OUT_Compression_Radio_Normal), TRUE);
+
+			SET_CHECK(OUT_Quantize_Check, g_quantize);
+
+			do{
+				HWND slider = GetDlgItem(hwndDlg, OUT_Quantize_Quality);
+
+				if (slider)
+				{
+					SendMessage(slider, (UINT)TBM_SETRANGEMIN, (WPARAM)(BOOL)FALSE, (LPARAM)0);
+					SendMessage(slider, (UINT)TBM_SETRANGEMAX, (WPARAM)(BOOL)FALSE, (LPARAM)100);
+					SendMessage(slider, (UINT)TBM_SETPOS, (WPARAM)(BOOL)TRUE, (LPARAM)g_quant_qual);
+				}
+			} while (0);
+
+			if(!g_isRGB8)
+			{
+				g_quantize = false;
+
+				ENABLE_ITEM(OUT_Quantize_Check, FALSE);
+			}
+
+			TrackQuantize(hwndDlg);
+			TrackSlider(hwndDlg);
 
 			SET_CHECK(OUT_Interlacing_Check, g_interlace);
 			SET_CHECK(OUT_Metadata_Check, g_metadata);
@@ -121,9 +182,29 @@ static BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARA
 						g_alpha == DIALOG_ALPHA_CHANNEL ? OUT_Alpha_Radio_Channel :
 						OUT_Alpha_Radio_None), TRUE);
 
+			TrackAlpha(hwndDlg);
+
+			SET_CHECK(OUT_Clean_Transparent, g_clean_trans);
+
 			return TRUE;
  
 		case WM_NOTIFY:
+			switch (LOWORD(wParam))
+			{
+				case OUT_Quantize_Check:
+					TrackQuantize(hwndDlg);
+					return TRUE;
+
+				case OUT_Quantize_Quality:
+					TrackSlider(hwndDlg);
+					return TRUE;
+
+				case OUT_Alpha_Radio_None:
+				case OUT_Alpha_Radio_Transparency:
+				case OUT_Alpha_Radio_Channel:
+					TrackAlpha(hwndDlg);
+					return TRUE;
+			}
 			return FALSE;
 
         case WM_COMMAND: 
@@ -139,6 +220,9 @@ static BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARA
 									GET_CHECK(OUT_Compression_Radio_High) ? DIALOG_COMPRESSION_HIGH :
 									DIALOG_COMPRESSION_NORMAL;
 
+					g_quantize = GET_CHECK(OUT_Quantize_Check);
+					g_quant_qual = GET_SLIDER(OUT_Quantize_Quality);
+
 					g_interlace = GET_CHECK(OUT_Interlacing_Check);
 					g_metadata = GET_CHECK(OUT_Metadata_Check);
 
@@ -146,6 +230,8 @@ static BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARA
 								GET_CHECK(OUT_Alpha_Radio_Transparency) ? DIALOG_ALPHA_TRANSPARENCY :
 								GET_CHECK(OUT_Alpha_Radio_Channel) ? DIALOG_ALPHA_CHANNEL :
 								DIALOG_ALPHA_TRANSPARENCY;
+
+					g_clean_trans = GET_CHECK(OUT_Clean_Transparent);
 
 
 					EndDialog(hwndDlg, 0);
@@ -158,16 +244,21 @@ static BOOL CALLBACK DialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARA
 bool
 SuperPNG_OutUI(
 	SuperPNG_OutUI_Data	*params,
+	bool				isRGB8,
 	bool				have_transparency,
 	const char			*alpha_name,
 	const void			*plugHndl,
 	const void			*mwnd)
 {
 	g_compression	= params->compression;
+	g_quantize		= params->quantize;
+	g_quant_qual	= params->quantize_quality;
 	g_interlace		= params->interlace;
 	g_metadata		= params->metadata;
 	g_alpha			= params->alpha;
+	g_clean_trans	= params->clean_transparent;
 	
+	g_isRGB8 = isRGB8;
 	g_have_transparency = have_transparency;
 	g_alpha_name = alpha_name;
 
@@ -178,9 +269,12 @@ SuperPNG_OutUI(
 	if(g_item_clicked == OUT_OK)
 	{
 		params->compression		= g_compression;
+		params->quantize		= g_quantize;
+		params->quantize_quality = g_quant_qual;
 		params->interlace		= g_interlace;
 		params->metadata		= g_metadata; 
 		params->alpha			= g_alpha;
+		params->clean_transparent = g_clean_trans;
 
 		return true;
 	}
