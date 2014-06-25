@@ -98,11 +98,11 @@ static void TrackSlider(HWND hwndDlg)
 {
 	const int quality = GET_SLIDER(OUT_Quantize_Quality);
 
-	const char *quality_string = (quality > 95 ? "Highest Quality" :
-									quality > 65 ? "High Quality" :
-									quality < 5 ? "Lowest Quality" :
-									quality < 35 ? "Low Quality" :
-									"Medium Quality");
+	const char *quality_string = (quality == 100 ? "Highest Quality" :
+									quality > 75 ? "High Quality" :
+									quality > 50 ? "Medium Quality" :
+									quality > 25 ? "Low Quality" :
+									"Lowest Quality");
 
 	SetDlgItemText(hwndDlg, OUT_Quantize_Label, quality_string);
 }
