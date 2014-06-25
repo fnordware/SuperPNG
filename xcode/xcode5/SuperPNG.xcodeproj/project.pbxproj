@@ -910,6 +910,7 @@
 					../../ext/pngquant/lib,
 					../../ext/lcms/include,
 					../../ext/lcms/src,
+					"../../ext/photoshopsdk/**",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PLUGIN_TYPE = 8BIF;
@@ -968,6 +969,7 @@
 					../../ext/pngquant/lib,
 					../../ext/lcms/include,
 					../../ext/lcms/src,
+					"../../ext/photoshopsdk/**",
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				PLUGIN_TYPE = 8BIF;
