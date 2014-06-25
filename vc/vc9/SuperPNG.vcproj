@@ -51,7 +51,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng"
+				AdditionalIncludeDirectories=".\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng;..\..\ext\pngquant\lib"
 				PreprocessorDefinitions="ISOLATION_AWARE_ENABLED=1;_DEBUG;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;WIN32=1;_WIN32;_WINDOWS;__PI__;PS_CS4_SDK"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="true"
@@ -144,7 +144,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng"
+				AdditionalIncludeDirectories=".\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng;..\..\ext\pngquant\lib"
 				PreprocessorDefinitions="ISOLATION_AWARE_ENABLED=1;_DEBUG;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;WIN32=1;_WIN32;_WINDOWS;__PI__;PS_CS4_SDK;PNG_SETJMP_NOT_SUPPORTED"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="true"
@@ -237,7 +237,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories=".\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng"
+				AdditionalIncludeDirectories=".\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng;..\..\ext\pngquant\lib"
 				PreprocessorDefinitions="ISOLATION_AWARE_ENABLED=1;NDEBUG;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;WIN32=1;_WIN32;_WINDOWS;__PI__;PS_CS4_SDK;$(NOINHERIT)"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -331,7 +331,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories=".\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng"
+				AdditionalIncludeDirectories=".\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng;..\..\ext\pngquant\lib"
 				PreprocessorDefinitions="ISOLATION_AWARE_ENABLED=1;NDEBUG;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;WIN32=1;_WIN32;_WINDOWS;__PI__;PS_CS4_SDK;PNG_SETJMP_NOT_SUPPORTED;$(NOINHERIT)"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"

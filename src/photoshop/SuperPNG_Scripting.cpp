@@ -155,16 +155,17 @@ OSErr WriteScriptParamsOnWrite(GPtr globals)
 			PIPutInt(token, keyPNGcompression, gOptions.compression);
 			PIPutInt(token, keyPNGfilter, gOptions.filter);
 			PIPutInt(token, keyPNGstrategy, gOptions.strategy);
-			PIPutBool(token, keyPNGinterlace, gOptions.interlace);
-			PIPutBool(token, keyPNGmeta, gOptions.metadata);
-			PIPutEnum(token, keyPNGalpha, typeAlphaChannel, AlphaToKey(gOptions.alpha));
-			PIPutBool(token, keyPNGpngquant, gOptions.pngquant);
 			
+			PIPutBool(token, keyPNGpngquant, gOptions.pngquant);
+			if(gOptions.pngquant)
+				PIPutInt(token, keyPNGquantQuality, gOptions.quant_quality);
+				
+			PIPutEnum(token, keyPNGalpha, typeAlphaChannel, AlphaToKey(gOptions.alpha));
 			if(gOptions.alpha != PNG_ALPHA_NONE)
 				PIPutBool(token, keyPNGcleanTransparent, gOptions.clean_transparent);
 			
-			if(gOptions.pngquant)
-				PIPutInt(token, keyPNGquantQuality, gOptions.quant_quality);
+			PIPutBool(token, keyPNGinterlace, gOptions.interlace);
+			PIPutBool(token, keyPNGmeta, gOptions.metadata);
 			
 			gotErr = CloseWriter(&token); /* closes and sets dialog optional */
 			/* done.  Now pass handle on to Photoshop */
