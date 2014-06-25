@@ -883,7 +883,7 @@ SuperPNG_OutUI(
 #define ABOUT_TEXT_LEFT		(DIALOG_MARGIN + DIALOG_MARGIN)
 #define ABOUT_TEXT_RIGHT	(ABOUT_WIDTH - ABOUT_TEXT_LEFT)
 #define ABOUT_TEXT_TEXT		"SuperPNG\n" \
-							"by Brendan Bolles"
+							"by Brendan Bolles and Kornel Lesinski"
 
 #define SMALL_TEXT_TOP		ABOUT_TEXT_BOTTOM
 #define SMALL_TEXT_BOTTOM	(SMALL_TEXT_TOP + 60)

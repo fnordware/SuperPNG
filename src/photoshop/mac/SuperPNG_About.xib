@@ -143,13 +143,13 @@
 						<object class="NSTextField" id="676108084">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{117, 105}, {128, 17}}</string>
+							<string key="NSFrame">{{17, 105}, {330, 17}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="842561919">
 								<int key="NSCellFlags">68288064</int>
 								<int key="NSCellFlags2">138413056</int>
-								<string key="NSContents">by Brendan Bolles</string>
+								<string key="NSContents">by Brendan Bolles &amp; Kornel Lesiński</string>
 								<reference key="NSSupport" ref="661905341"/>
 								<reference key="NSControlView" ref="676108084"/>
 								<reference key="NSBackgroundColor" ref="1069468178"/>
@@ -359,9 +359,9 @@
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>{{458, 661}, {364, 215}}</string>
+					<string>{{547, 621}, {364, 215}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{458, 661}, {364, 215}}</string>
+					<string>{{547, 621}, {364, 215}}</string>
 					<boolean value="NO"/>
 					<string>{196, 240}</string>
 					<string>{{202, 428}, {480, 270}}</string>
@@ -457,7 +457,7 @@
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">SuperPNG_About_Controller.h</string>
+						<string key="minorKey">../../src/photoshop/mac/SuperPNG_About_Controller.h</string>
 					</object>
 				</object>
 			</object>
@@ -773,7 +773,7 @@
 			<integer value="3000" key="NS.object.0"/>
 		</object>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
-		<string key="IBDocument.LastKnownRelativeProjectPath">SuperPNG.xcodeproj</string>
+		<string key="IBDocument.LastKnownRelativeProjectPath">../../../xcode/xcode3/SuperPNG.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
 			<string key="NS.key.0">SuperPNG_banner</string>
