@@ -925,6 +925,10 @@
 		2A01738E112F17A8005CDE51 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Carbon.framework/Versions/A/Frameworks",
+				);
 				INFOPLIST_FILE = SuperPNG_Info.plist;
 				PRODUCT_NAME = SuperPNG;
 				REZ_PREFIX_FILE = "$(SRCROOT)/../../ext/photoshopsdk/pluginsdk/samplecode/common/includes/MachOMacrezXcode.h";
@@ -936,6 +940,10 @@
 		4FADC23408B4156C00ABE55E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Carbon.framework/Versions/A/Frameworks",
+				);
 				INFOPLIST_FILE = SuperPNG_Info.plist;
 				PRODUCT_NAME = SuperPNG;
 				REZ_PREFIX_FILE = "$(SRCROOT)/../../ext/photoshopsdk/pluginsdk/samplecode/common/includes/MachOMacrezXcode.h";
