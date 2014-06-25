@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -122,9 +122,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2A73D70E1958D54700A3EB2C /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/AppKit.framework; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		2A73D70F1958D54700A3EB2C /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Carbon.framework; sourceTree = SYSTEM_DEVELOPER_DIR; };
-		2A73D7101958D54700A3EB2C /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		2A73D70E1958D54700A3EB2C /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/AppKit.framework; sourceTree = DEVELOPER_DIR; };
+		2A73D70F1958D54700A3EB2C /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Carbon.framework; sourceTree = DEVELOPER_DIR; };
+		2A73D7101958D54700A3EB2C /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		2A73D7141958D59700A3EB2C /* AEInteraction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AEInteraction.h; sourceTree = "<group>"; };
 		2A73D7151958D59700A3EB2C /* Appearance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Appearance.h; sourceTree = "<group>"; };
 		2A73D7161958D59700A3EB2C /* Appearance.r */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.rez; path = Appearance.r; sourceTree = "<group>"; };
@@ -711,9 +711,10 @@
 		089C1669FE841209C02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastUpgradeCheck = 0600;
 			};
 			buildConfigurationList = 4FADC23708B4156C00ABE55E /* Build configuration list for PBXProject "SuperPNG" */;
-			compatibilityVersion = "Xcode 2.4";
+			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -886,7 +887,6 @@
 				ARCHS = (
 					x86_64,
 					i386,
-					ppc,
 				);
 				COPY_PHASE_STRIP = YES;
 				ENABLE_OPENMP_SUPPORT = YES;
@@ -910,12 +910,13 @@
 					../../ext/pngquant/lib,
 					../../ext/lcms/include,
 					../../ext/lcms/src,
+					"../../ext/photoshopsdk/**",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PLUGIN_TYPE = 8BIF;
 				PREBINDING = NO;
 				REZ_PREFIX_FILE = "$(SRCROOT)/../../ext/adobe_photoshop_cs5_sdk_mac/pluginsdk/samplecode/common/includes/MachOMacrezXcode.h";
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = plugin;
 				ZERO_LINK = NO;
 			};
@@ -924,7 +925,10 @@
 		2A01738E112F17A8005CDE51 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Carbon.framework/Versions/A/Frameworks",
+				);
 				INFOPLIST_FILE = SuperPNG_Info.plist;
 				PRODUCT_NAME = SuperPNG;
 				REZ_PREFIX_FILE = "$(SRCROOT)/../../ext/photoshopsdk/pluginsdk/samplecode/common/includes/MachOMacrezXcode.h";
@@ -936,7 +940,10 @@
 		4FADC23408B4156C00ABE55E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Carbon.framework/Versions/A/Frameworks",
+				);
 				INFOPLIST_FILE = SuperPNG_Info.plist;
 				PRODUCT_NAME = SuperPNG;
 				REZ_PREFIX_FILE = "$(SRCROOT)/../../ext/photoshopsdk/pluginsdk/samplecode/common/includes/MachOMacrezXcode.h";
@@ -951,7 +958,6 @@
 				ARCHS = (
 					x86_64,
 					i386,
-					ppc,
 				);
 				COPY_PHASE_STRIP = NO;
 				ENABLE_OPENMP_SUPPORT = YES;
@@ -971,12 +977,13 @@
 					../../ext/pngquant/lib,
 					../../ext/lcms/include,
 					../../ext/lcms/src,
+					"../../ext/photoshopsdk/**",
 				);
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PLUGIN_TYPE = 8BIF;
 				PREBINDING = NO;
 				REZ_PREFIX_FILE = "$(SRCROOT)/../../ext/adobe_photoshop_cs5_sdk_mac/pluginsdk/samplecode/common/includes/MachOMacrezXcode.h";
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 				WRAPPER_EXTENSION = plugin;
 				ZERO_LINK = NO;
