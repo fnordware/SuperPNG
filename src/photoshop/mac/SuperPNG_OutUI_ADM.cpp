@@ -345,11 +345,11 @@ QuantizeSliderTrackProc(ADMItemRef item, ADMTrackerRef inTracker)
 	
 	ADMItemRef quality_label = sADMDialog->GetItem(dialog, OUT_Quantize_Slider_Text);
 	
-	const char *quality_string = (g_quant_qual > 95 ? "Highest Quality" :
-									g_quant_qual > 65 ? "High Quality" :
-									g_quant_qual < 5 ? "Lowest Quality" :
-									g_quant_qual < 35 ? "Low Quality" :
-									"Medium Quality");
+	const char *quality_string = (g_quant_qual == 100 ? "Highest Quality" :
+									g_quant_qual > 75 ? "High Quality" :
+									g_quant_qual > 50 ? "Medium Quality" :
+									g_quant_qual > 25 ? "Low Quality" :
+									"Lowest Quality");
 									
 	sADMItem->SetText(quality_label, quality_string);
 	
@@ -579,11 +579,11 @@ static ASErr ASAPI DialogInit(ADMDialogRef dialog)
 	ADMItemRef Quantize_label = sADMItem->Create(dialog, OUT_Quantize_Slider_Text,
 								kADMTextStaticType, &Quantize_label_rect, NULL, NULL);
 
-	const char *quality_string = (g_quant_qual > 95 ? "Highest Quality" :
-									g_quant_qual > 65 ? "High Quality" :
-									g_quant_qual < 5 ? "Lowest Quality" :
-									g_quant_qual < 35 ? "Low Quality" :
-									"Medium Quality");
+	const char *quality_string = (g_quant_qual == 100 ? "Highest Quality" :
+									g_quant_qual > 75 ? "High Quality" :
+									g_quant_qual > 50 ? "Medium Quality" :
+									g_quant_qual > 25 ? "Low Quality" :
+									"Lowest Quality");
 									
 	sADMItem->SetText(Quantize_label, quality_string);
 	
