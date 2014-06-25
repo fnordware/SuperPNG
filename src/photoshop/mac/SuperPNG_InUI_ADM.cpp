@@ -34,19 +34,20 @@
 
 #include "PIUSuites.h"
 
-#include "ADMVersion.h"
-#include "ADMDialog.h"
-#include "ADMItem.h"
-#include "ADMNotifier.h"
-#include "ADMDrawer.h"
-#include "ADMImage.h"
-
 #include "math.h"
 
 // ==========
 // Only building this on 32-bit (non-Cocoa) architectures
 // ==========
 #if !__LP64__
+
+
+#include "ADMVersion.h"
+#include "ADMDialog.h"
+#include "ADMItem.h"
+#include "ADMNotifier.h"
+#include "ADMDrawer.h"
+#include "ADMImage.h"
 
 
 #if TARGET_API_MAC_CARBON

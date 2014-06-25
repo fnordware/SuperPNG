@@ -36,8 +36,6 @@
 
 #include "SuperPNG_version.h"
 
-#include <Carbon/Carbon.h>
-
 // ==========
 // Only building this on 64-bit (Cocoa) architectures
 // ==========
@@ -87,15 +85,13 @@ SuperPNG_InUI(
 		
 		CFRelease(always_val);
 	}
+	
+	// user can force dialog open by holding shift or option
+	const NSUInteger flags = [[NSApp currentEvent] modifierFlags];
+	const bool shift_key = ( (flags & NSShiftKeyMask) || (flags & NSAlternateKeyMask) );
 
-	// user can force dialog open buy holding shift or option
-    UInt32 keys = GetCurrentEventKeyModifiers();
-	bool option_key = ( (keys & shiftKey) || (keys & rightShiftKey) || (keys & optionKey) || (keys & rightOptionKey) );
-
-
-	if(always_dialog || option_key)
+	if(always_dialog || shift_key)
 	{
-		// do the dialog (or maybe not (but we still load the object to get the prefs)
 		NSString *bundle_id = [NSString stringWithUTF8String:(const char *)plugHndl];
 
 		Class ui_controller_class = [[NSBundle bundleWithIdentifier:bundle_id]
@@ -148,6 +144,7 @@ SuperPNG_InUI(
 bool
 SuperPNG_OutUI(
 	SuperPNG_OutUI_Data	*params,
+	bool				isRGB8,
 	bool				have_transparency,
 	const char			*alpha_name,
 	const void			*plugHndl,
@@ -163,9 +160,13 @@ SuperPNG_OutUI(
 	if(ui_controller_class)
 	{
 		SuperPNG_OutUI_Controller *ui_controller = [[ui_controller_class alloc] init:params->compression
+														quantize:params->quantize
+														quantQuality:params->quantize_quality
 														alpha:params->alpha
+														clean_transparent:params->clean_transparent
 														interlace:params->interlace
 														metadata:params->metadata
+														isRGB8:isRGB8
 														have_transparency:have_transparency
 														alpha_name:alpha_name];
 		if(ui_controller)
@@ -178,10 +179,13 @@ SuperPNG_OutUI(
 				
 				if(modal_result == NSRunStoppedResponse)
 				{
-					params->compression	= [ui_controller getCompression];
-					params->alpha		= [ui_controller getAlpha];
-					params->interlace	= [ui_controller getInterlace];
-					params->metadata	= [ui_controller getMetadata];
+					params->compression			= [ui_controller getCompression];
+					params->quantize			= [ui_controller getQuantize];
+					params->quantize_quality	= [ui_controller getQuantizeQuality];
+					params->alpha				= [ui_controller getAlpha];
+					params->clean_transparent	= [ui_controller getCleanTransparent];
+					params->interlace			= [ui_controller getInterlace];
+					params->metadata			= [ui_controller getMetadata];
 					
 					result = true;
 				}

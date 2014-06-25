@@ -49,8 +49,6 @@
 #include "PIDefines.h"
 
 #ifdef __PIMac__
-	#include "Types.r"
-	#include "SysTypes.r"
 	#include "PIGeneral.r"
 #elif defined(__PIWin__)
 	#include "PIGeneral.h"
@@ -233,7 +231,26 @@ resource 'aete' (ResourceID, plugInName " dictionary", purgeable)
 				keyPNGalpha,
 				typeEnumerated,
 				"Source of the alpha channel",
-				flagsSingleProperty
+				flagsSingleProperty,
+				
+				"Clean Transparent",
+				keyPNGcleanTransparent,
+				typeBoolean,
+				"Clear areas where alpha is 0",
+				flagsSingleProperty,
+				
+				"Quantizing",
+				keyPNGpngquant,
+				typeBoolean,
+				"Quantize and save as PNG8",
+				flagsSingleProperty,
+				
+				"Quantize Quality",
+				keyPNGquantQuality,
+				typeInteger,
+				"Quality of the Quantization",
+				flagsSingleProperty,
+
 			},
 			{},
 		},

@@ -35,8 +35,7 @@
 
 @interface SuperPNG_InUI_Controller : NSObject {
 	IBOutlet NSWindow *theWindow;
-	IBOutlet NSButton *transparentRadio;
-	IBOutlet NSButton *channelRadio;
+	IBOutlet NSMatrix *alphaMatrix;
 	IBOutlet NSButton *multCheckbox;
 	IBOutlet NSButton *alwaysCheckbox;
 }

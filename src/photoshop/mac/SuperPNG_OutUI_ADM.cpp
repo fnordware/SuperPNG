@@ -34,13 +34,6 @@
 
 #include "PIUSuites.h"
 
-#include "ADMVersion.h"
-#include "ADMDialog.h"
-#include "ADMItem.h"
-#include "ADMNotifier.h"
-#include "ADMDrawer.h"
-#include "ADMImage.h"
-
 #include "SuperPNG_version.h"
 
 #include "math.h"
@@ -49,6 +42,14 @@
 // Only building this on 32-bit (non-Cocoa) architectures
 // ==========
 #if !__LP64__
+
+#include "ADMVersion.h"
+#include "ADMDialog.h"
+#include "ADMItem.h"
+#include "ADMNotifier.h"
+#include "ADMDrawer.h"
+#include "ADMImage.h"
+
 
 static AutoSuite<ADMDialogSuite3> sADMDialog(kADMDialogSuite, kADMDialogSuiteVersion3);
 static AutoSuite<ADMItemSuite4> sADMItem(kADMItemSuite, kADMItemSuiteVersion4);
@@ -78,9 +79,13 @@ enum {
 	OUT_Radio_4,
 	OUT_Faster_Label,
 	OUT_Smaller_Label,
+	OUT_Quantize_Check,
+	OUT_Quantize_Slider,
+	OUT_Quantize_Slider_Text,
 	OUT_Alpha_None,
 	OUT_Alpha_Transparency,
 	OUT_Alpha_Channel,
+	OUT_Clean_Transparent_Check,
 	OUT_Alpha_Border,
 	OUT_Alpha_Border_Text,
 	OUT_Interlace_Check,
@@ -92,7 +97,7 @@ enum {
 #define DIALOG_TITLE	"SuperPNG Options"
 
 #define DIALOG_WIDTH	400
-#define DIALOG_HEIGHT	310
+#define DIALOG_HEIGHT	360
 
 
 #define BUTTON_WIDTH	80
@@ -178,7 +183,23 @@ enum {
 #define SMALLER_RIGHT	(SMALLER_LEFT + LABEL_WIDTH)
 #define SMALLER_TEXT	"Smaller Files"
 
-#define ALPHA_NONE_TOP		(FASTER_BOTTOM + ITEM_SPACE + ITEM_SPACE + ITEM_SPACE + ITEM_SPACE)
+#define QUANTIZE_TOP	(FASTER_BOTTOM + ITEM_SPACE)
+#define QUANTIZE_BOTTOM	(QUANTIZE_TOP + CHECKBOX_HEIGHT)
+#define QUANTIZE_LEFT	RADIO_1_LEFT
+#define QUANTIZE_RIGHT	(QUANTIZE_LEFT + 80)
+#define QUANTIZE_TEXT	"Quantize"
+
+#define QUANT_QUALITY_BOTTOM	(QUANTIZE_BOTTOM)
+#define QUANT_QUALITY_TOP		(QUANT_QUALITY_BOTTOM - 8)
+#define QUANT_QUALITY_LEFT		(QUANTIZE_RIGHT + ITEM_SPACE)
+#define QUANT_QUALITY_RIGHT		RADIO_4_RIGHT
+
+#define QUANT_QUALITY_LABEL_TOP		QUANT_QUALITY_BOTTOM
+#define QUANT_QUALITY_LABEL_BOTTOM	(QUANT_QUALITY_LABEL_TOP + RADIO_HEIGHT)
+#define QUANT_QUALITY_LABEL_LEFT	QUANT_QUALITY_LEFT
+#define QUANT_QUALITY_LABEL_RIGHT	QUANT_QUALITY_RIGHT
+
+#define ALPHA_NONE_TOP		(QUANTIZE_BOTTOM + ITEM_SPACE + ITEM_SPACE + ITEM_SPACE + ITEM_SPACE)
 #define ALPHA_NONE_BOTTOM	(ALPHA_NONE_TOP + RADIO_HEIGHT)
 #define ALPHA_NONE_LEFT		RADIO_1_LEFT
 #define ALPHA_NONE_RIGHT	(ALPHA_NONE_LEFT + CHECKBOX_WIDTH)
@@ -196,8 +217,14 @@ enum {
 #define ALPHA_CHANNEL_RIGHT	ALPHA_NONE_RIGHT
 #define ALPHA_CHANNEL_TEXT	"Channel Blah"
 
+#define CLEAN_TRANSPARENT_TOP		(ALPHA_CHANNEL_BOTTOM + ITEM_SPACE)
+#define CLEAN_TRANSPARENT_BOTTOM	(CLEAN_TRANSPARENT_TOP + CHECKBOX_HEIGHT)
+#define CLEAN_TRANSPARENT_LEFT		(ALPHA_CHANNEL_LEFT + ITEM_SPACE + ITEM_SPACE)
+#define CLEAN_TRANSPARENT_RIGHT		(CLEAN_TRANSPARENT_LEFT + 100)
+#define CLEAN_TRANSPARENT_TEXT		"Clean Transparent"
+
 #define ALPHA_BORDER_TOP	(ALPHA_NONE_TOP - ITEM_SPACE)
-#define ALPHA_BORDER_BOTTOM	(ALPHA_CHANNEL_BOTTOM + ITEM_SPACE)
+#define ALPHA_BORDER_BOTTOM	(CLEAN_TRANSPARENT_BOTTOM + ITEM_SPACE)
 #define ALPHA_BORDER_LEFT	(ALPHA_NONE_LEFT - DIALOG_MARGIN)
 #define ALPHA_BORDER_RIGHT	(ALPHA_NONE_RIGHT + DIALOG_MARGIN)
 
@@ -237,10 +264,14 @@ extern SPPluginRef		gPlugInRef;
 
 
 static DialogCompression	g_compression	= DIALOG_COMPRESSION_NORMAL;
+static bool					g_quantize = FALSE;
+static int					g_quant_qual = 80;
 static bool					g_interlace = FALSE;
 static bool					g_metadata = TRUE;
 static DialogAlpha			g_alpha = DIALOG_ALPHA_NONE;
+static bool					g_clean_transparent = FALSE;
 
+static bool					g_isRGB8 = true;
 static bool					g_have_transparency = false;
 static const char			*g_alpha_name = NULL;
 
@@ -285,14 +316,54 @@ RadioNotifyProc(ADMItemRef item, ADMNotifierRef notifier)
 }
 
 static void ASAPI
+QuantizeNotifyProc(ADMItemRef item, ADMNotifierRef notifier)
+{
+	sADMItem->DefaultNotify(item, notifier);
+		
+	if(sADMNotify->IsNotifierType(notifier, kADMUserChangedNotifier))	
+	{
+		g_quantize = sADMItem->GetBooleanValue(item);
+		
+		ADMDialogRef dialog = sADMItem->GetDialog(item);
+		
+		ADMItemRef quantize_slider = sADMDialog->GetItem(dialog, OUT_Quantize_Slider);
+		ADMItemRef quantize_label = sADMDialog->GetItem(dialog, OUT_Quantize_Slider_Text);
+		
+		sADMItem->Enable(quantize_slider, g_quantize);
+		sADMItem->Show(quantize_label, g_quantize);
+	}
+}
+
+static ASBoolean ASAPI
+QuantizeSliderTrackProc(ADMItemRef item, ADMTrackerRef inTracker)
+{
+	ADMDialogRef dialog = sADMItem->GetDialog(item);
+	
+	sADMItem->DefaultTrack(item, inTracker);
+	
+	g_quant_qual = sADMItem->GetIntValue(item);
+	
+	ADMItemRef quality_label = sADMDialog->GetItem(dialog, OUT_Quantize_Slider_Text);
+	
+	const char *quality_string = (g_quant_qual > 95 ? "Highest Quality" :
+									g_quant_qual > 65 ? "High Quality" :
+									g_quant_qual < 5 ? "Lowest Quality" :
+									g_quant_qual < 35 ? "Low Quality" :
+									"Medium Quality");
+									
+	sADMItem->SetText(quality_label, quality_string);
+	
+	return sADMItem->DefaultTrack(item, inTracker);
+}
+
+static void ASAPI
 AlphaNotifyProc(ADMItemRef item, ADMNotifierRef notifier)
 {
 	ASErr err = kSPNoError;
-	//AEGP_SuiteHandler suites(sP);
 
 	sADMItem->DefaultNotify(item, notifier);
 		
-	if (sADMNotify->IsNotifierType(notifier, kADMUserChangedNotifier))	
+	if(sADMNotify->IsNotifierType(notifier, kADMUserChangedNotifier))	
 	{
 		if( sADMItem->GetBooleanValue(item) ) // this may be unnecessary
 		{
@@ -313,8 +384,26 @@ AlphaNotifyProc(ADMItemRef item, ADMNotifierRef notifier)
 					break;
 			}
 		}
+		
+		ADMDialogRef dialog = sADMItem->GetDialog(item);
+		
+		ADMItemRef clean_trans = sADMDialog->GetItem(dialog, OUT_Clean_Transparent_Check);
+		
+		sADMItem->Enable(clean_trans, g_alpha != DIALOG_ALPHA_NONE);
 	}
 }
+
+static void ASAPI
+CleanTransparentNotifyProc(ADMItemRef item, ADMNotifierRef notifier)
+{
+	sADMItem->DefaultNotify(item, notifier);
+		
+	if(sADMNotify->IsNotifierType(notifier, kADMUserChangedNotifier))	
+	{
+		g_clean_transparent = sADMItem->GetBooleanValue(item);
+	}
+}
+
 
 static void ASAPI
 InterlaceNotifyProc(ADMItemRef item, ADMNotifierRef notifier)
@@ -452,6 +541,59 @@ static ASErr ASAPI DialogInit(ADMDialogRef dialog)
 	sADMItem->SetJustify(Smaller, kADMCenterJustify);
 	
 	
+	// Quantize
+	ADMRect Quantize_rect = INIT_RECT(QUANTIZE_TOP, QUANTIZE_LEFT, QUANTIZE_BOTTOM, QUANTIZE_RIGHT);
+	
+	ADMItemRef Quantize = sADMItem->Create(dialog, OUT_Quantize_Check,
+								kADMTextCheckBoxType, &Quantize_rect, NULL, NULL);
+
+	sADMItem->SetText(Quantize, QUANTIZE_TEXT);
+	
+	sADMItem->SetNotifyProc(Quantize, QuantizeNotifyProc);
+	
+	sADMItem->SetBooleanValue(Quantize, g_quantize);
+	
+	if(!g_isRGB8)
+		sADMItem->Enable(Quantize, FALSE);
+	
+	
+	// Quantize quality slider
+	ADMRect Quantize_slider_rect = INIT_RECT(QUANT_QUALITY_TOP, QUANT_QUALITY_LEFT, QUANT_QUALITY_BOTTOM, QUANT_QUALITY_RIGHT);
+
+	ADMItemRef Quantize_slider = sADMItem->Create(dialog, OUT_Quantize_Slider,
+								kADMSliderType, &Quantize_slider_rect, NULL, NULL);
+	
+	sADMItem->SetMinIntValue(Quantize_slider, 0);
+	sADMItem->SetMaxIntValue(Quantize_slider, 100);
+
+	sADMItem->SetIntValue(Quantize_slider, g_quant_qual);
+
+	sADMItem->SetTrackProc(Quantize_slider, QuantizeSliderTrackProc);
+	
+	sADMItem->Enable(Quantize_slider, g_quantize);
+	
+	
+	// Quantize quality label
+	ADMRect Quantize_label_rect = INIT_RECT(QUANT_QUALITY_LABEL_TOP, QUANT_QUALITY_LABEL_LEFT, QUANT_QUALITY_LABEL_BOTTOM, QUANT_QUALITY_LABEL_RIGHT);
+	
+	ADMItemRef Quantize_label = sADMItem->Create(dialog, OUT_Quantize_Slider_Text,
+								kADMTextStaticType, &Quantize_label_rect, NULL, NULL);
+
+	const char *quality_string = (g_quant_qual > 95 ? "Highest Quality" :
+									g_quant_qual > 65 ? "High Quality" :
+									g_quant_qual < 5 ? "Lowest Quality" :
+									g_quant_qual < 35 ? "Low Quality" :
+									"Medium Quality");
+									
+	sADMItem->SetText(Quantize_label, quality_string);
+	
+	sADMItem->SetFont(Quantize_label, kADMPaletteFont);
+	
+	sADMItem->SetJustify(Quantize_label, kADMCenterJustify);
+	
+	sADMItem->Show(Quantize_label, g_quantize);
+	
+	
 	// alpha border
 	ADMRect Alpha_border_rect = INIT_RECT(ALPHA_BORDER_TOP, ALPHA_BORDER_LEFT, ALPHA_BORDER_BOTTOM, ALPHA_BORDER_RIGHT);
 	
@@ -495,6 +637,23 @@ static ASErr ASAPI DialogInit(ADMDialogRef dialog)
 	sADMItem->SetNotifyProc(Alpha_none, AlphaNotifyProc);
 	sADMItem->SetNotifyProc(Alpha_trans, AlphaNotifyProc);
 	sADMItem->SetNotifyProc(Alpha_channel, AlphaNotifyProc);
+	
+	
+	ADMRect Clean_trans_rect = INIT_RECT(CLEAN_TRANSPARENT_TOP, CLEAN_TRANSPARENT_LEFT, CLEAN_TRANSPARENT_BOTTOM, CLEAN_TRANSPARENT_RIGHT);
+	
+	ADMItemRef Clean_trans = sADMItem->Create(dialog, OUT_Clean_Transparent_Check,
+								kADMTextCheckBoxType, &Clean_trans_rect, NULL, NULL);
+								
+	sADMItem->SetText(Clean_trans, CLEAN_TRANSPARENT_TEXT);
+	
+	sADMItem->SetFont(Clean_trans, kADMPaletteFont);
+	
+	sADMItem->SetNotifyProc(Clean_trans, CleanTransparentNotifyProc);
+	
+	sADMItem->SetBooleanValue(Clean_trans, g_clean_transparent);
+	
+	sADMItem->Enable(Clean_trans, g_alpha != DIALOG_ALPHA_NONE);
+	
 	
 	
 	ADMItemRef active_alpha = (	(g_alpha == DIALOG_ALPHA_TRANSPARENCY)	? Alpha_trans :
@@ -643,21 +802,25 @@ CreateImage(void)
 bool
 SuperPNG_OutUI(
 	SuperPNG_OutUI_Data	*params,
+	bool				isRGB8,
 	bool				have_transparency,
 	const char			*alpha_name,
 	const void			*plugHndl,
 	const void			*mwnd)
 {
-	// global globals
 	GPtr globals = (GPtr)mwnd;
 	
-	g_compression	= params->compression;
-	g_interlace		= params->interlace;
-	g_metadata		= params->metadata;
-	g_alpha			= params->alpha;
+	g_compression		= params->compression;
+	g_quantize			= params->quantize;
+	g_quant_qual		= params->quantize_quality;
+	g_interlace			= params->interlace;
+	g_metadata			= params->metadata;
+	g_alpha				= params->alpha;
+	g_clean_transparent	= params->clean_transparent;
 	
+	g_isRGB8			= isRGB8;
 	g_have_transparency = have_transparency;
-	g_alpha_name = alpha_name;
+	g_alpha_name		= alpha_name;
 		
 
 	// create banner image
@@ -680,10 +843,13 @@ SuperPNG_OutUI(
 
 	if(item == OUT_OK)
 	{
-		params->compression		= g_compression;
-		params->interlace		= g_interlace;
-		params->metadata		= g_metadata; 
-		params->alpha			= g_alpha;
+		params->compression			= g_compression;
+		params->quantize			= g_quantize;
+		params->quantize_quality	= g_quant_qual;
+		params->interlace			= g_interlace;
+		params->metadata			= g_metadata; 
+		params->alpha				= g_alpha;
+		params->clean_transparent	= g_clean_transparent;
 		
 		return true;
 	}		

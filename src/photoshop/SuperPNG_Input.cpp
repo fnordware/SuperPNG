@@ -101,6 +101,7 @@ static void png_replace_read_data(png_structp png_ptr, png_bytep data, png_size_
 
 #pragma mark-
 
+#define PF_MAX_CHAN8			255
 #define PF_MAX_CHAN16			32768
 
 static inline unsigned16 Demote(unsigned16 val)
@@ -115,20 +116,36 @@ static inline T minimum(T a, T b)
 }
 
 
-typedef struct {
-	unsigned8	r;
-	unsigned8	g;
-	unsigned8	b;
-	unsigned8	a;
-} RGBApixel8;
+template <typename T>
+struct RGBApixel {
+	T r;
+	T g;
+	T b;
+	T a;
+};
 
-static void Premultiply(RGBApixel8 *buf, int64 len)
+typedef RGBApixel<unsigned8> RGBApixel8;
+typedef RGBApixel<unsigned16> RGBApixel16;
+
+
+template <typename T>
+struct YApixel {
+	T y;
+	T a;
+};
+
+typedef YApixel<unsigned8> YApixel8;
+typedef YApixel<unsigned16> YApixel16;
+
+
+template <typename T, int MAX_VAL>
+static void PremultiplyRGBA(T *buf, int64 len)
 {
 	while(len--)
 	{
 		if(buf->a != 255)
 		{	
-			float mult = (float)buf->a / 255.f;
+			const float mult = (float)buf->a / (float)MAX_VAL;
 			
 			buf->r = ((float)buf->r * mult) + 0.5f;
 			buf->g = ((float)buf->g * mult) + 0.5f;
@@ -139,42 +156,15 @@ static void Premultiply(RGBApixel8 *buf, int64 len)
 	}
 }
 
-typedef struct {
-	unsigned16	r;
-	unsigned16	g;
-	unsigned16	b;
-	unsigned16	a;
-} RGBApixel16;
 
-static void Premultiply(RGBApixel16 *buf, int64 len)
-{
-	while(len--)
-	{
-		if(buf->a != PF_MAX_CHAN16)
-		{	
-			float mult = (float)buf->a / (float)PF_MAX_CHAN16;
-			
-			buf->r = ((float)buf->r * mult) + 0.5f;
-			buf->g = ((float)buf->g * mult) + 0.5f;
-			buf->b = ((float)buf->b * mult) + 0.5f;
-		}
-		
-		buf++;
-	}
-}
-
-typedef struct {
-	unsigned8	y;
-	unsigned8	a;
-} YApixel8;
-
-static void Premultiply(YApixel8 *buf, int64 len)
+template <typename T, int MAX_VAL>
+static void PremultiplyYA(T *buf, int64 len)
 {
 	while(len--)
 	{
 		if(buf->a != 255)
 		{	
-			float mult = (float)buf->a / 255.f;
+			const float mult = (float)buf->a / (float)MAX_VAL;
 			
 			buf->y = ((float)buf->y * mult) + 0.5f;
 		}
@@ -183,27 +173,28 @@ static void Premultiply(YApixel8 *buf, int64 len)
 	}
 }
 
-typedef struct {
-	unsigned16	y;
-	unsigned16	a;
-} YApixel16;
 
-static void Premultiply(YApixel16 *buf, int64 len)
+static void Premultiply(GPtr globals, int64 len)
 {
-	while(len--)
+	if(gStuff->planes == 4)
 	{
-		if(buf->a != PF_MAX_CHAN16)
-		{	
-			float mult = (float)buf->a / (float)PF_MAX_CHAN16;
-			
-			buf->y = ((float)buf->y * mult) + 0.5f;
-		}
-		
-		buf++;
+		if(gStuff->depth == 16)
+			PremultiplyRGBA<RGBApixel16, PF_MAX_CHAN16>((RGBApixel16 *)gPixelData, len);
+		else if(gStuff->depth == 8)
+			PremultiplyRGBA<RGBApixel8, PF_MAX_CHAN8>((RGBApixel8 *)gPixelData, len);
+	}
+	else if(gStuff->planes == 2)
+	{
+		if(gStuff->depth == 16)
+			PremultiplyYA<YApixel16, PF_MAX_CHAN16>((YApixel16 *)gPixelData, len);
+		else if(gStuff->depth == 8)
+			PremultiplyYA<YApixel8, PF_MAX_CHAN8>((YApixel8 *)gPixelData, len);
 	}
 }
+
 
 #pragma mark-
+
 
 static inline double RoundDPI(double dpi)
 {
@@ -215,8 +206,6 @@ static inline double RoundDPI(double dpi)
 #endif
 }
 
-
-// these stolen from an earlier version of Little CMS and private parts of the current version
 
 static cmsBool
 SetTextTags(cmsHPROFILE hProfile, const wchar_t* Description)
@@ -246,6 +235,7 @@ Error:
         cmsMLUfree(CopyrightMLU);
     return rc;
 }
+
 
 static void ReadMetadataPre(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 {
@@ -421,7 +411,6 @@ static void ReadMetadataPre(GPtr globals, png_structp png_ptr, png_infop info_pt
 		gStuff->imageVRes = (dpi_y * 65536.0) + 0.5;
 	}
 }
-
 
 	
 static void ReadMetadataPost(GPtr globals, png_structp png_ptr, png_infop info_ptr)
@@ -627,7 +616,7 @@ void SuperPNG_FileInfo(GPtr globals)
 		}
 		
 		
-		if( trans_counter > 1 || (gStuff->hostSig == 'FXTC') ) //!(gStuff->hostModes & plugInModeIndexedColor)
+		if( trans_counter > 1 || (gStuff->hostSig == 'FXTC') )
 		{
 			png_set_palette_to_rgb(png_ptr);
 			
@@ -640,6 +629,8 @@ void SuperPNG_FileInfo(GPtr globals)
 		}
 		else
 		{
+			assert(gStuff->hostModes & plugInModeIndexedColor);
+		
 			png_colorp palette;
 			int num_palette;
 			int32 counter=0;
@@ -674,14 +665,14 @@ void SuperPNG_FileInfo(GPtr globals)
 	}	 
 	else if(color_type & PNG_COLOR_MASK_COLOR)
 	{
-		if( gStuff->depth == 16 )
+		if(gStuff->depth == 16)
 		{
 			gStuff->imageMode = plugInModeRGB48;
 		}
 		else
 			gStuff->imageMode = plugInModeRGBColor;
 
-		if( color_type & PNG_COLOR_MASK_ALPHA )
+		if(color_type & PNG_COLOR_MASK_ALPHA)
 		{
 			gStuff->planes = 4;
 		}
@@ -709,7 +700,7 @@ void SuperPNG_FileInfo(GPtr globals)
 			gStuff->imageMode = plugInModeGrayScale;
 		
 		
-		if( color_type & PNG_COLOR_MASK_ALPHA )
+		if(color_type & PNG_COLOR_MASK_ALPHA)
 		{
 			gStuff->planes = 2;
 		}
@@ -783,9 +774,9 @@ void SuperPNG_ReadFile(GPtr globals)
 		&interlace_type, NULL, NULL);
 	
 	// transformations
-	if( bit_depth < 8 )
+	if(bit_depth < 8)
 	{
-		if( color_type & PNG_COLOR_MASK_PALETTE )
+		if(color_type & PNG_COLOR_MASK_PALETTE)
 		{
 			png_set_packing(png_ptr);
 			//png_set_packswap(png_ptr);
@@ -795,7 +786,7 @@ void SuperPNG_ReadFile(GPtr globals)
 			png_set_expand_gray_1_2_4_to_8(png_ptr);
 		}
 	}
-	else if( bit_depth == 16 )
+	else if(bit_depth == 16)
 	{
 	#ifndef __PIMacPPC__
 		png_set_swap(png_ptr);
@@ -823,7 +814,7 @@ void SuperPNG_ReadFile(GPtr globals)
 	gStuff->rowBytes = gRowBytes = gStuff->colBytes * width;
 	
 	if(gStuff->depth == 16)
-		gStuff->maxValue = 0x8000;
+		gStuff->maxValue = PF_MAX_CHAN16; // 0x8000
 	
 	gStuff->loPlane = 0;
 	gStuff->hiPlane = gStuff->planes - 1;
@@ -868,23 +859,11 @@ void SuperPNG_ReadFile(GPtr globals)
 			// premultiply if necessary
 			if(gInOptions.alpha == PNG_ALPHA_CHANNEL && gInOptions.mult == TRUE)
 			{
-				int64 pixels = (int64)width * (int64)height;
+				const int64 pixels = (int64)width * (int64)height;
 				
-				if(gStuff->planes == 4)
-				{
-					if(gStuff->depth == 16)
-						Premultiply((RGBApixel16 *)gPixelData, pixels);
-					else if(gStuff->depth == 8)
-						Premultiply((RGBApixel8 *)gPixelData, pixels);
-				}
-				else if(gStuff->planes == 2)
-				{
-					if(gStuff->depth == 16)
-						Premultiply((YApixel16 *)gPixelData, pixels);
-					else if(gStuff->depth == 8)
-						Premultiply((YApixel8 *)gPixelData, pixels);
-				}
+				Premultiply(globals, pixels);
 			}
+			
 			
 			// read into Photoshop
 			gStuff->theRect.top = gStuff->theRect32.top = 0;
@@ -949,22 +928,9 @@ void SuperPNG_ReadFile(GPtr globals)
 				// premultiply if necessary
 				if(gInOptions.alpha == PNG_ALPHA_CHANNEL && gInOptions.mult == TRUE)
 				{
-					int64 pixels = (int64)width * (int64)block_height;
+					const int64 pixels = (int64)width * (int64)block_height;
 					
-					if(gStuff->planes == 4)
-					{
-						if(gStuff->depth == 16)
-							Premultiply((RGBApixel16 *)gPixelData, pixels);
-						else if(gStuff->depth == 8)
-							Premultiply((RGBApixel8 *)gPixelData, pixels);
-					}
-					else if(gStuff->planes == 2)
-					{
-						if(gStuff->depth == 16)
-							Premultiply((YApixel16 *)gPixelData, pixels);
-						else if(gStuff->depth == 8)
-							Premultiply((YApixel8 *)gPixelData, pixels);
-					}
+					Premultiply(globals, pixels);
 				}
 				
 				

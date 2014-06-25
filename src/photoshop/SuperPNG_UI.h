@@ -53,9 +53,12 @@ typedef struct {
 
 typedef struct {
 	DialogCompression	compression;
+	bool				quantize;
+	unsigned int		quantize_quality;
 	bool				interlace;
 	bool				metadata;
 	DialogAlpha			alpha;
+	bool				clean_transparent;
 } SuperPNG_OutUI_Data;
 
 // SuperPNG UI
@@ -76,6 +79,7 @@ SuperPNG_InUI(
 bool
 SuperPNG_OutUI(
 	SuperPNG_OutUI_Data	*params,
+	bool				isRGB8,
 	bool				have_transparency,
 	const char			*alpha_name,
 	const void			*plugHndl,

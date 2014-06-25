@@ -30,6 +30,8 @@
 
 #include "SuperPNG.h"
 
+#include "libimagequant.h"
+
 #include "lcms2_internal.h"
 
 #include <stdlib.h>
@@ -148,11 +150,11 @@ ReadICCXYZ(cmsHPROFILE hProfile, cmsTagSignature sig, cmsCIEXYZ *Value, cmsBool 
 static cmsBool
 cmsTakeColorants(cmsCIEXYZTRIPLE *Dest, cmsHPROFILE hProfile)
 {
-       if (ReadICCXYZ(hProfile, cmsSigRedColorantTag, &Dest -> Red, TRUE) < 0) return FALSE;
-       if (ReadICCXYZ(hProfile, cmsSigGreenColorantTag, &Dest -> Green, TRUE) < 0) return FALSE;
-       if (ReadICCXYZ(hProfile, cmsSigBlueColorantTag, &Dest -> Blue, TRUE) < 0) return FALSE;
+	if (ReadICCXYZ(hProfile, cmsSigRedColorantTag, &Dest -> Red, TRUE) < 0) return FALSE;
+	if (ReadICCXYZ(hProfile, cmsSigGreenColorantTag, &Dest -> Green, TRUE) < 0) return FALSE;
+	if (ReadICCXYZ(hProfile, cmsSigBlueColorantTag, &Dest -> Blue, TRUE) < 0) return FALSE;
 
-       return TRUE;
+	return TRUE;
 }
 
 
@@ -540,12 +542,104 @@ static void png_init_write(GPtr globals, png_structp *png_ptr, png_infop *info_p
 }
 
 
+template <typename T>
+struct RGBApixel {
+	T r;
+	T g;
+	T b;
+	T a;
+};
+
+typedef RGBApixel<unsigned8> RGBApixel8;
+typedef RGBApixel<unsigned16> RGBApixel16;
+
+
+template <typename T>
+struct YApixel {
+	T y;
+	T a;
+};
+
+typedef YApixel<unsigned8> YApixel8;
+typedef YApixel<unsigned16> YApixel16;
+
+
+template <typename T>
+static void CleanRGBA(T *pix, int64 len)
+{
+	while(len--)
+	{
+		if(pix->a == 0)
+		{
+			pix->r = pix->g = pix->b = 0;
+		}
+		
+		pix++;
+	}
+}
+
+
+template <typename T>
+static void CleanYA(T *pix, int64 len)
+{
+	while(len--)
+	{
+		if(pix->a == 0)
+		{
+			pix->y = 0;
+		}
+		
+		pix++;
+	}
+}
+
+
+static void CleanTransparent(GPtr globals, int num_channels, int64 len)
+{
+	if(num_channels == 4)
+	{
+		if(gStuff->depth == 16)
+			CleanRGBA((RGBApixel16 *)gPixelData, len);
+		else if(gStuff->depth == 8)
+			CleanRGBA((RGBApixel8 *)gPixelData, len);
+	}
+	else if(num_channels == 2)
+	{
+		if(gStuff->depth == 16)
+			CleanYA((YApixel16 *)gPixelData, len);
+		else if(gStuff->depth == 8)
+			CleanYA((YApixel8 *)gPixelData, len);
+	}
+}
+
+
+typedef struct {
+	unsigned8 *buf;
+	size_t rowbytes;
+} RGBbuf;
+
+static void rgb2rgba_callback(liq_color row_out[], int row, int width, void* user_info)
+{
+	RGBbuf *rgb = (RGBbuf *)user_info;
+	
+	unsigned8 *in_pix = rgb->buf + (rgb->rowbytes * row);
+	
+	liq_color *out_pix = row_out;
+	
+	while(width--)
+	{
+		out_pix->r = *in_pix++;
+		out_pix->g = *in_pix++;
+		out_pix->b = *in_pix++;
+		out_pix->a = 255;
+		
+		out_pix++;
+	}
+}
+
+
 void SuperPNG_WriteFile(GPtr globals)
 {
-	png_structp png_ptr;
-	png_infop info_ptr;
-	
-	
 	if(gStuff->HostSupports32BitCoordinates && gStuff->imageSize32.h && gStuff->imageSize32.v)
 		gStuff->PluginUsing32BitCoordinates = TRUE;
 		
@@ -587,7 +681,7 @@ void SuperPNG_WriteFile(GPtr globals)
 		num_channels = (use_alpha ? 2 : 1);
 		color_type = (use_alpha ? PNG_COLOR_TYPE_GRAY_ALPHA : PNG_COLOR_TYPE_GRAY);
 	}
-	else //  Assuming RGB if not greyscale
+	else // Assuming RGB if not greyscale
 	{
 		assert(gStuff->planes >= 3);
 	
@@ -624,11 +718,30 @@ void SuperPNG_WriteFile(GPtr globals)
 		bit_depth = 8;
 		plane_bytes = 1;
 	}
-
-
+	
+	
+	if(gOptions.pngquant)
+	{
+		if(gStuff->imageMode != plugInModeRGBColor || gStuff->planes < 3 || gStuff->depth != 8)
+		{
+			gOptions.pngquant = FALSE;
+		}
+		else
+		{
+			color_type = PNG_COLOR_TYPE_PALETTE;
+			
+			if(gOptions.quant_quality < 0)
+				gOptions.quant_quality = 0;
+			else if(gOptions.quant_quality > 100)
+				gOptions.quant_quality = 100;
+		}
+	}
 
 
 	// Set up the PNG pointers
+	png_structp png_ptr;
+	png_infop info_ptr;
+	
 	png_init_write(globals, &png_ptr, &info_ptr);
 
 
@@ -724,20 +837,10 @@ void SuperPNG_WriteFile(GPtr globals)
 	//	png_set_swap(png_ptr);
 #endif
 	
-	// Set the various Meta Data chunks
 	if(gOptions.metadata)
 		WriteMetadata(globals, png_ptr, info_ptr);
 
-		
-	
-
-	// Write the PNG header.
-
-	png_write_info(png_ptr, info_ptr);
-	
-	
-	// Set basic image parameters.	
-		
+				
 	gStuff->loPlane = 0;
 	gStuff->hiPlane = hi_plane;
 	gStuff->colBytes = col_bytes;
@@ -761,7 +864,7 @@ void SuperPNG_WriteFile(GPtr globals)
 	}
 		
 	
-	if(interlace_type == PNG_INTERLACE_ADAM7) 
+	if(interlace_type == PNG_INTERLACE_ADAM7 || gOptions.pngquant) 
 	{
 		// Load the whole image into RAM and write it all at once. 
 		
@@ -789,30 +892,161 @@ void SuperPNG_WriteFile(GPtr globals)
 			}
 			
 			
-			if(gStuff->depth == 16)
+			if(gResult == noErr)
 			{
-				int64 samples = (int64)width * (int64)height * (int64)num_channels;
-				
-				unsigned16 *pix = (unsigned16 *)gPixelData;
-				
-				while(samples--)
+				if(gOptions.clean_transparent)
 				{
-					*pix = ByteSwap( Promote(*pix) );
-					pix++;
+					const int64 pixels = (int64)width * (int64)height;
+					
+					CleanTransparent(globals, num_channels, pixels);
+				}
+				
+				
+				if(gOptions.pngquant)
+				{
+					liq_attr *attr = liq_attr_create();
+					
+					liq_set_quality(attr, 0, gOptions.quant_quality);
+					
+					// convoluted way of getting the user's speed selection from the dialog
+					const int liq_speed = (gOptions.compression == Z_BEST_COMPRESSION ? 3 :
+											gOptions.compression == Z_NO_COMPRESSION ? 9 :
+											gOptions.filter == PNG_FILTER_SUB ? 7 :
+											5);
+					
+					liq_set_speed(attr, liq_speed);
+				
+					liq_image *image = NULL;
+					
+					if(gStuff->planes == 4)
+					{
+						image = liq_image_create_rgba(attr, gPixelData, width, height, 0);
+					}
+					else if(gStuff->planes == 3)
+					{
+						RGBbuf buf = { (unsigned8 *)gPixelData, gRowBytes };
+						
+						image = liq_image_create_custom(attr, rgb2rgba_callback, &buf, width, height, 0);
+					}
+					
+					if(image != NULL)
+					{
+						liq_result *result = liq_quantize_image(attr, image);
+						
+						PIUpdateProgress(1, 3);
+						
+						if(result != NULL)
+						{
+							liq_set_dithering_level(result, 1.0);
+						
+							const size_t pngbuf_rowbytes = sizeof(unsigned8) * width;
+							const size_t pngbuf_size = pngbuf_rowbytes * height;
+							
+							gResult = TestAbort();
+							
+							BufferID pngID = 0;
+							
+							if(gResult == noErr)
+								gResult = myAllocateBuffer(globals, pngbuf_size, &pngID);
+							
+							if(pngID != 0 && gResult == noErr)
+							{
+								Ptr pngbuf = myLockBuffer(globals, pngID, TRUE);
+								
+								liq_error liq_err = liq_write_remapped_image(result, image, pngbuf, pngbuf_size);
+								
+								PIUpdateProgress(2, 3);
+								
+								gResult = TestAbort();
+								
+								if(liq_err == LIQ_OK && gResult == noErr)
+								{
+									const liq_palette *pal = liq_get_palette(result);
+									
+									png_color palette[PNG_MAX_PALETTE_LENGTH];
+									png_byte trans[PNG_MAX_PALETTE_LENGTH];
+
+									for(int i=0; i < pal->count; i++)
+									{
+										palette[i].red   = pal->entries[i].r;
+										palette[i].green = pal->entries[i].g;
+										palette[i].blue  = pal->entries[i].b;
+										
+										trans[i] = pal->entries[i].a;
+									}
+									
+									if(pal->count <= 128)
+									{
+										png_set_packing(png_ptr);
+										png_set_packswap(png_ptr);
+									}
+									
+									png_set_PLTE(png_ptr, info_ptr, palette, pal->count);
+									
+									if(gStuff->planes == 4)
+										png_set_tRNS(png_ptr, info_ptr, trans, pal->count, NULL);
+									
+									
+									png_write_info(png_ptr, info_ptr);
+									
+									png_bytepp row_pointers = (png_bytepp)png_malloc(png_ptr, height * sizeof(png_bytep));
+									
+									for(int row=0; row < height; row++)
+										row_pointers[row] = (png_bytep)( (char *)pngbuf + (row * pngbuf_rowbytes) );
+									
+
+									png_write_image(png_ptr, row_pointers);
+									
+									PIUpdateProgress(3, 3);
+									
+									png_free(png_ptr, (void *)row_pointers);
+								}
+								
+								myFreeBuffer(globals, pngID);
+							}
+							
+							liq_result_destroy(result);
+						}
+						else
+							gResult = formatBadParameters;
+						
+						liq_image_destroy(image);
+					}
+					else
+						gResult = formatBadParameters;
+					
+					liq_attr_destroy(attr);
+				}
+				else
+				{
+					if(gStuff->depth == 16)
+					{
+						// Convert Adobe 16-bit to full 16-bit and swap endian
+						int64 samples = (int64)width * (int64)height * (int64)num_channels;
+						
+						unsigned16 *pix = (unsigned16 *)gPixelData;
+						
+						while(samples--)
+						{
+							*pix = ByteSwap( Promote(*pix) );
+							pix++;
+						}
+					}
+
+					png_write_info(png_ptr, info_ptr);
+					
+					png_bytepp row_pointers = (png_bytepp)png_malloc(png_ptr, height * sizeof(png_bytep));
+					
+					for(int row=0; row < height; row++)
+						row_pointers[row] = (png_bytep)( (char *)gPixelData + (row * gRowBytes) );
+					
+
+					png_write_image(png_ptr, row_pointers);
+					
+					
+					png_free(png_ptr, (void *)row_pointers);
 				}
 			}
-			
-
-			png_bytepp row_pointers = (png_bytepp)png_malloc(png_ptr, height * sizeof(png_bytep));
-			
-			for (int row=0; row < height; row++)
-				row_pointers[row] = (png_bytep)( (char *)gPixelData + (row * gRowBytes) );
-			
-
-			png_write_image(png_ptr, row_pointers);
-			
-			
-			png_free(png_ptr, (void *)row_pointers);
 			
 			myFreeBuffer(globals, bufferID);
 			
@@ -822,7 +1056,7 @@ void SuperPNG_WriteFile(GPtr globals)
 	else
 	{
 		// write some reasonable number of scanlines at a time
-		int num_scanlines = (gStuff->tileHeight == 0 ? 256 : gStuff->tileHeight);
+		const int num_scanlines = (gStuff->tileHeight == 0 ? 256 : gStuff->tileHeight);
 		
 		BufferID bufferID = 0;
 		
@@ -830,11 +1064,14 @@ void SuperPNG_WriteFile(GPtr globals)
 		
 		if(gResult == noErr && bufferID != 0)
 		{
+			png_write_info(png_ptr, info_ptr);
+			
+		
 			gStuff->data = gPixelData = myLockBuffer(globals, bufferID, TRUE);
 		
 			png_bytepp row_pointers = (png_bytepp)png_malloc(png_ptr, num_scanlines * sizeof(png_bytep));
 			
-			for (int row=0; row < num_scanlines; row++)
+			for(int row=0; row < num_scanlines; row++)
 				row_pointers[row] = (png_bytep)( (char *)gPixelData + (row * gRowBytes) );
 		
 		
@@ -842,8 +1079,8 @@ void SuperPNG_WriteFile(GPtr globals)
 			
 			while(y < height && gResult == noErr)
 			{
-				int high_scanline = minimum<int>(y + num_scanlines - 1, height - 1);
-				int block_height = 1 + high_scanline - y;
+				const int high_scanline = minimum<int>(y + num_scanlines - 1, height - 1);
+				const int block_height = 1 + high_scanline - y;
 				
 				gStuff->theRect.top = gStuff->theRect32.top = y;
 				gStuff->theRect.bottom = gStuff->theRect32.bottom = high_scanline + 1;
@@ -858,6 +1095,14 @@ void SuperPNG_WriteFile(GPtr globals)
 					PixelMemoryDesc memDesc = { (char *)gPixelData + ((num_channels - 1) * plane_bytes), gRowBytes * 8, col_bytes * 8, 0, bit_depth };					
 				
 					gResult = ReadProc(alpha_channel->port, &scaling, &writeRect, &memDesc, &wroteRect);
+				}
+				
+				
+				if(gOptions.clean_transparent)
+				{
+					const int64 pixels = (int64)width * (int64)block_height;
+					
+					CleanTransparent(globals, num_channels, pixels);
 				}
 				
 				
