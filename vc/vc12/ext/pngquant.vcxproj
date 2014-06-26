@@ -84,7 +84,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\ext\pngquant\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\ext\pngquant-msvc\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;USE_SSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -98,7 +98,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\..\ext\pngquant\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\ext\pngquant-msvc\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;USE_SSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -113,7 +113,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\ext\pngquant\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\ext\pngquant-msvc\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;USE_SSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -130,7 +130,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\..\ext\pngquant\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\ext\pngquant-msvc\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;USE_SSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -140,23 +140,23 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\ext\pngquant\lib\blur.c" />
-    <ClCompile Include="..\..\..\ext\pngquant\lib\libimagequant.c" />
-    <ClCompile Include="..\..\..\ext\pngquant\lib\mediancut.c" />
-    <ClCompile Include="..\..\..\ext\pngquant\lib\mempool.c" />
-    <ClCompile Include="..\..\..\ext\pngquant\lib\nearest.c" />
-    <ClCompile Include="..\..\..\ext\pngquant\lib\pam.c" />
-    <ClCompile Include="..\..\..\ext\pngquant\lib\viter.c" />
+    <ClCompile Include="..\..\..\ext\pngquant-msvc\lib\blur.c" />
+    <ClCompile Include="..\..\..\ext\pngquant-msvc\lib\libimagequant.c" />
+    <ClCompile Include="..\..\..\ext\pngquant-msvc\lib\mediancut.c" />
+    <ClCompile Include="..\..\..\ext\pngquant-msvc\lib\mempool.c" />
+    <ClCompile Include="..\..\..\ext\pngquant-msvc\lib\nearest.c" />
+    <ClCompile Include="..\..\..\ext\pngquant-msvc\lib\pam.c" />
+    <ClCompile Include="..\..\..\ext\pngquant-msvc\lib\viter.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\ext\pngquant\lib\blur.h" />
-    <ClInclude Include="..\..\..\ext\pngquant\lib\libimagequant.h" />
-    <ClInclude Include="..\..\..\ext\pngquant\lib\mediancut.h" />
-    <ClInclude Include="..\..\..\ext\pngquant\lib\mempool.h" />
-    <ClInclude Include="..\..\..\ext\pngquant\lib\nearest.h" />
-    <ClInclude Include="..\..\..\ext\pngquant\lib\pam.h" />
+    <ClInclude Include="..\..\..\ext\pngquant-msvc\lib\blur.h" />
+    <ClInclude Include="..\..\..\ext\pngquant-msvc\lib\libimagequant.h" />
+    <ClInclude Include="..\..\..\ext\pngquant-msvc\lib\mediancut.h" />
+    <ClInclude Include="..\..\..\ext\pngquant-msvc\lib\mempool.h" />
+    <ClInclude Include="..\..\..\ext\pngquant-msvc\lib\nearest.h" />
+    <ClInclude Include="..\..\..\ext\pngquant-msvc\lib\pam.h" />
     <ClInclude Include="stdbool.h" />
-    <ClInclude Include="..\..\..\ext\pngquant\lib\viter.h" />
+    <ClInclude Include="..\..\..\ext\pngquant-msvc\lib\viter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;..\..\..\ext\pngquant\lib"
+				AdditionalIncludeDirectories=".;..\..\..\ext\pngquant-msvc\lib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -107,7 +107,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;..\..\..\ext\pngquant\lib"
+				AdditionalIncludeDirectories=".;..\..\..\ext\pngquant-msvc\lib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -171,7 +171,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;..\..\..\ext\pngquant\lib"
+				AdditionalIncludeDirectories=".;..\..\..\ext\pngquant-msvc\lib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -235,7 +235,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;..\..\..\ext\pngquant\lib"
+				AdditionalIncludeDirectories=".;..\..\..\ext\pngquant-msvc\lib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -281,7 +281,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\ext\pngquant\lib\blur.c"
+				RelativePath="..\..\..\ext\pngquant-msvc\lib\blur.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -317,27 +317,27 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\pngquant\lib\libimagequant.c"
+				RelativePath="..\..\..\ext\pngquant-msvc\lib\libimagequant.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\pngquant\lib\mediancut.c"
+				RelativePath="..\..\..\ext\pngquant-msvc\lib\mediancut.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\pngquant\lib\mempool.c"
+				RelativePath="..\..\..\ext\pngquant-msvc\lib\mempool.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\pngquant\lib\nearest.c"
+				RelativePath="..\..\..\ext\pngquant-msvc\lib\nearest.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\pngquant\lib\pam.c"
+				RelativePath="..\..\..\ext\pngquant-msvc\lib\pam.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\pngquant\lib\viter.c"
+				RelativePath="..\..\..\ext\pngquant-msvc\lib\viter.c"
 				>
 			</File>
 		</Filter>
@@ -347,27 +347,27 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\ext\pngquant\lib\blur.h"
+				RelativePath="..\..\..\ext\pngquant-msvc\lib\blur.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\pngquant\lib\libimagequant.h"
+				RelativePath="..\..\..\ext\pngquant-msvc\lib\libimagequant.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\pngquant\lib\mediancut.h"
+				RelativePath="..\..\..\ext\pngquant-msvc\lib\mediancut.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\pngquant\lib\mempool.h"
+				RelativePath="..\..\..\ext\pngquant-msvc\lib\mempool.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\pngquant\lib\nearest.h"
+				RelativePath="..\..\..\ext\pngquant-msvc\lib\nearest.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\pngquant\lib\pam.h"
+				RelativePath="..\..\..\ext\pngquant-msvc\lib\pam.h"
 				>
 			</File>
 			<File
@@ -375,7 +375,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ext\pngquant\lib\viter.h"
+				RelativePath="..\..\..\ext\pngquant-msvc\lib\viter.h"
 				>
 			</File>
 		</Filter>
