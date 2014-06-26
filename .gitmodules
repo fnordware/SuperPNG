@@ -7,3 +7,10 @@
 [submodule "ext/lcms"]
 	path = ext/lcms
 	url = git://github.com/mm2/Little-CMS.git
+[submodule "ext/pngquant"]
+	path = ext/pngquant
+	url = git://github.com/pornel/pngquant.git
+[submodule "ext/pngquant-msvc"]
+	path = ext/pngquant-msvc
+	url = git://github.com/pornel/pngquant.git
+	branch = msvc
