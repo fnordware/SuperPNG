@@ -11,5 +11,4 @@ BSD
 
 Authors
 ------
-Brendan Bolles
-Kornel Lesiński
+Brendan Bolles and Kornel Lesiński
