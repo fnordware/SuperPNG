@@ -685,13 +685,13 @@ void SuperPNG_WriteFile(GPtr globals)
 	{
 		assert(gStuff->planes >= 3);
 	
-		bool have_transparency = (gStuff->planes >= 4);
-		bool have_alpha_channel = (gStuff->channelPortProcs && gStuff->documentInfo && gStuff->documentInfo->alphaChannels);
+		const bool have_transparency = (gStuff->planes >= 4);
+		const bool have_alpha_channel = (gStuff->channelPortProcs && gStuff->documentInfo && gStuff->documentInfo->alphaChannels);
 
-		bool use_transparency = (have_transparency && gOptions.alpha == PNG_ALPHA_TRANSPARENCY);
-		bool use_alpha_channel = (have_alpha_channel && gOptions.alpha == PNG_ALPHA_CHANNEL);
+		const bool use_transparency = (have_transparency && gOptions.alpha == PNG_ALPHA_TRANSPARENCY);
+		const bool use_alpha_channel = (have_alpha_channel && gOptions.alpha == PNG_ALPHA_CHANNEL);
 		
-		bool use_alpha = (use_transparency || use_alpha_channel);
+		const bool use_alpha = (use_transparency || use_alpha_channel);
 		
 		hi_plane = (use_transparency ? 3 : 2);
 		num_channels = (use_alpha ? 4 : 3);
@@ -722,7 +722,7 @@ void SuperPNG_WriteFile(GPtr globals)
 	
 	if(gOptions.pngquant)
 	{
-		if(gStuff->imageMode != plugInModeRGBColor || gStuff->planes < 3 || gStuff->depth != 8)
+		if(gStuff->imageMode != plugInModeRGBColor || num_channels < 3 || gStuff->depth != 8)
 		{
 			gOptions.pngquant = FALSE;
 		}
@@ -918,11 +918,11 @@ void SuperPNG_WriteFile(GPtr globals)
 				
 					liq_image *image = NULL;
 					
-					if(gStuff->planes == 4)
+					if(num_channels == 4)
 					{
 						image = liq_image_create_rgba(attr, gPixelData, width, height, 0);
 					}
-					else if(gStuff->planes == 3)
+					else if(num_channels == 3)
 					{
 						RGBbuf buf = { (unsigned8 *)gPixelData, gRowBytes };
 						
@@ -983,7 +983,7 @@ void SuperPNG_WriteFile(GPtr globals)
 									
 									png_set_PLTE(png_ptr, info_ptr, palette, pal->count);
 									
-									if(gStuff->planes == 4)
+									if(num_channels == 4)
 										png_set_tRNS(png_ptr, info_ptr, trans, pal->count, NULL);
 									
 									
