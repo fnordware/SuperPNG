@@ -113,7 +113,7 @@ resource 'PiPL' (ResourceID, plugInName " PiPL", purgeable)
 			noDuotone, noLABColor
 		},
 			
-		EnableInfo { "in (PSHOP_ImageMode, BitmapMode, GrayScaleMode, IndexedMode, RGBMode, Gray16Mode, RGB48Mode)" },
+		EnableInfo { "in (PSHOP_ImageMode, BitmapMode, GrayScaleMode, IndexedMode, RGBMode, Gray16Mode, RGB48Mode, RGBColorMode)" },
 	
 		FmtFileType { 'PNGf', '8BIM' },
 		ReadTypes { { 'PNGf', '    ' } },
