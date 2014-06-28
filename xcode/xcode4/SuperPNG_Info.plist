@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleExecutable</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.fnordware.Photoshop.SuperPNG</string>
+	<key>CFBundleSignature</key>
+	<string>8BIM</string>
+	<key>CFBundlePackageType</key>
+	<string>$(PLUGIN_TYPE)</string>
+	<key>CFBundleGetInfoString</key>
+	<string>2.0, ©2002-2011 fnord</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+</dict>
+</plist>
