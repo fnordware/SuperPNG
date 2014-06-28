@@ -237,6 +237,18 @@ Error:
 }
 
 
+static inline cmsUInt16Number
+SwapIccEndian(cmsUInt16Number in)
+{
+#ifndef __PIMacPPC__
+	return ( (in >> 8) | (in << 8) );
+#else
+	return in;
+#endif
+}
+
+
+
 static void ReadMetadataPre(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 {
 	// ICC profiles
@@ -378,7 +390,20 @@ static void ReadMetadataPre(GPtr globals, png_structp png_ptr, png_infop info_pt
 					
 					Ptr icc_ptr = myLockHandle(globals, gStuff->iCCprofileData);
 					
-					cmsSaveProfileToMem(iccH, icc_ptr, &profile_len);
+					const cmsBool save_result = cmsSaveProfileToMem(iccH, icc_ptr, &profile_len);
+					
+					assert(save_result == TRUE);
+					
+					// It's good form to use a single date for all ICC profiles you synthesize,
+					// otherwise files that should have totally identical profiles won't.
+					cmsICCHeader *icc_header = (cmsICCHeader *)icc_ptr;
+					
+					icc_header->date.year	= SwapIccEndian(2012);
+					icc_header->date.month	= SwapIccEndian(12);
+					icc_header->date.day	= SwapIccEndian(12);
+					icc_header->date.hours	= SwapIccEndian(12);
+					icc_header->date.minutes= SwapIccEndian(12);
+					icc_header->date.seconds= SwapIccEndian(12);
 										
 					myUnlockHandle(globals, gStuff->iCCprofileData);
 				
