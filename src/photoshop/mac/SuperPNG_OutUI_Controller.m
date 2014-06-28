@@ -95,15 +95,21 @@
 
 	[theWindow center];
 	
+	theResult = DIALOG_RESULT_CONTINUE;
+	
 	return self;
 }
 
 - (IBAction)clickedOK:(id)sender {
-	[NSApp stopModal];
+	theResult = DIALOG_RESULT_OK;
 }
 
 - (IBAction)clickedCancel:(id)sender {
-    [NSApp abortModal];
+    theResult = DIALOG_RESULT_CANCEL;
+}
+
+- (DialogResult)getResult {
+	return theResult;
 }
 
 - (IBAction)trackAlpha:(id)sender {

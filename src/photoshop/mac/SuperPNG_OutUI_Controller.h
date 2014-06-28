@@ -32,6 +32,12 @@
 
 #include "SuperPNG_UI.h"
 
+typedef enum {
+	DIALOG_RESULT_CONTINUE = 0,
+	DIALOG_RESULT_OK,
+	DIALOG_RESULT_CANCEL
+} DialogResult;
+
 @interface SuperPNG_OutUI_Controller : NSObject {
 	IBOutlet NSWindow *theWindow;
 	IBOutlet NSMatrix *compressionMatrix;
@@ -42,6 +48,7 @@
 	IBOutlet NSButton *cleanTransparentCheckbox;
 	IBOutlet NSButton *interlaceCheckbox;
 	IBOutlet NSButton *metadataCheckbox;
+	DialogResult theResult;
 }
 - (id)init:(DialogCompression)compression
 	quantize:(BOOL)quantize
@@ -56,6 +63,7 @@
 
 - (IBAction)clickedOK:(id)sender;
 - (IBAction)clickedCancel:(id)sender;
+- (DialogResult)getResult;
 
 - (IBAction)trackAlpha:(id)sender;
 - (IBAction)trackQuantize:(id)sender;
