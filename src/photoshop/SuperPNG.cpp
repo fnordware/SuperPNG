@@ -278,7 +278,7 @@ static void DoReadStart(GPtr globals)
 {
 	A_Boolean reverting = ReadParams(globals, &gInOptions);
 	
-	if(!reverting)
+	if(!reverting && gStuff->hostSig != 'FXTC')
 	{
 		SuperPNG_InUI_Data params;
 		

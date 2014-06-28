@@ -175,9 +175,25 @@ SuperPNG_OutUI(
 			
 			if(my_window)
 			{
-				NSInteger modal_result = [NSApp runModalForWindow:my_window];
+				// We have to run our own dialog loop because calling [NSApp stopModal]
+				// will cause all dialogs to close.  This is especially a problem in
+				// After Effects where this dialog is spawned by another dialog.
+				NSInteger modal_result = NSRunContinuesResponse;
+				DialogResult dialog_result = DIALOG_RESULT_CONTINUE;
 				
-				if(modal_result == NSRunStoppedResponse)
+				NSModalSession modal_session = [NSApp beginModalSessionForWindow:my_window];
+				
+				do{
+					modal_result = [NSApp runModalSession:modal_session];
+
+					dialog_result = [ui_controller getResult];
+				}
+				while(dialog_result == DIALOG_RESULT_CONTINUE && modal_result == NSRunContinuesResponse);
+				
+				[NSApp endModalSession:modal_session];
+				
+				
+				if(dialog_result == DIALOG_RESULT_OK || modal_result == NSRunStoppedResponse)
 				{
 					params->compression			= [ui_controller getCompression];
 					params->quantize			= [ui_controller getQuantize];
