@@ -35,7 +35,7 @@
 #define SuperPNG_Minor_Version 5
 #define SuperPNG_Version_String "2.5"
 #define SuperPNG_Build_Date __DATE__
-#define SuperPNG_Build_Date_Manual "25 June 2014"
+#define SuperPNG_Build_Date_Manual "7 August 2014"
 #define SuperPNG_Build_Complete_Manual "v2.5 - " SuperPNG_Build_Date
 #define SuperPNG_Copyright_Year "2002-2014"
 #define SuperPNG_Build_Year "2014"

@@ -265,7 +265,7 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 	png_set_tIME(png_ptr, info_ptr, &pngTime);
 
 	
-	if( (gStuff->hostSig != 'FXTC') && gStuff->imageHRes )
+	if( (gStuff->hostSig != 'FXTC') && (gStuff->imageHRes > 0) )
 	{
 		// pixels per inch
 		const double dpi_x = (double)gStuff->imageHRes / 65536.0;
@@ -285,7 +285,7 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 	
 	
 	// Write ICC Profile - this will only happen if the user checks the box in Save As
-	if( gStuff->canUseICCProfiles && (gStuff->iCCprofileSize > 0) && (gStuff->iCCprofileData != NULL) )
+	if(gStuff->canUseICCProfiles && (gStuff->iCCprofileSize > 0) && (gStuff->iCCprofileData != NULL) )
 	{
 		const Ptr icc = myLockHandle(globals, gStuff->iCCprofileData);
 	
@@ -399,7 +399,7 @@ static void WriteMetadata(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 		}
 	}
 
-	if(gStuff->propertyProcs)
+	if(gStuff->propertyProcs && gStuff->propertyProcs->numPropertyProcs >= 1)
 	{
 		int32 handleSize[6] = {0,0,0,0,0,0}; // Max of 6 items for now
 		intptr_t simpleProperty[6] = {0,0,0,0,0,0};

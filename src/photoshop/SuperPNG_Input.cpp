@@ -440,7 +440,7 @@ static void ReadMetadataPre(GPtr globals, png_structp png_ptr, png_infop info_pt
 	
 static void ReadMetadataPost(GPtr globals, png_structp png_ptr, png_infop info_ptr)
 {
-	if(gStuff->propertyProcs)
+	if(gStuff->propertyProcs && gStuff->propertyProcs->numPropertyProcs >= 2)
 	{
 		png_textp text_blocks = NULL;
 		int num_blocks = 0;
@@ -744,12 +744,10 @@ void SuperPNG_FileInfo(GPtr globals)
 		gStuff->transparencyPlane = gStuff->planes - 1;
 		gStuff->transparencyMatting = 0;
 	}
-
-	if(gStuff->hostSig != 'FXTC')
-	{
-		ReadMetadataPre(globals, png_ptr, info_ptr);
-		ReadMetadataPost(globals, png_ptr, info_ptr);
-	}
+	
+	
+	ReadMetadataPre(globals, png_ptr, info_ptr);
+	ReadMetadataPost(globals, png_ptr, info_ptr);
 	
 	
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
