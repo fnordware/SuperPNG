@@ -14,3 +14,7 @@
 	path = ext/pngquant-msvc
 	url = git://github.com/pornel/pngquant.git
 	branch = msvc
+[submodule "ext/pngquant-msvc-fnordware"]
+	path = ext/pngquant-msvc-fnordware
+	url = https://github.com/fnordware/pngquant.git
+	branch = msvc-fnordware
