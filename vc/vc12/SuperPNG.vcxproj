@@ -97,7 +97,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng;..\..\ext\pngquant-msvc\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng;..\..\ext\pngquant-msvc-fnordware\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ISOLATION_AWARE_ENABLED=1;_DEBUG;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;WIN32=1;_WIN32;_WINDOWS;__PI__;PS_CS4_SDK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -138,7 +138,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng;..\..\ext\pngquant-msvc\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng;..\..\ext\pngquant-msvc-fnordware\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ISOLATION_AWARE_ENABLED=1;_DEBUG;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;WIN32=1;_WIN32;_WINDOWS;__PI__;PS_CS4_SDK;PNG_SETJMP_NOT_SUPPORTED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -179,7 +179,7 @@
     </Midl>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>.\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng;..\..\ext\pngquant-msvc\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng;..\..\ext\pngquant-msvc-fnordware\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ISOLATION_AWARE_ENABLED=1;NDEBUG;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;WIN32=1;_WIN32;_WINDOWS;__PI__;PS_CS4_SDK</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -221,7 +221,7 @@
     </Midl>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>.\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng;..\..\ext\pngquant-msvc\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\ext;..\..\src\photoshop;..\..\src\photoshop\win;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\samplecode\Common\Includes;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\Photoshop;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\PICA_SP;..\..\ext\adobe_photoshop_cs5_sdk_win\pluginsdk\photoshopapi\ADM;..\..\ext\zlib;..\..\ext\lcms\include;..\..\ext\lcms\src;..\..\ext\libpng;..\..\ext\pngquant-msvc-fnordware\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ISOLATION_AWARE_ENABLED=1;NDEBUG;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;WIN32=1;_WIN32;_WINDOWS;__PI__;PS_CS4_SDK;PNG_SETJMP_NOT_SUPPORTED</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
